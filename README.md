@@ -1,79 +1,72 @@
-# Owenshen's AiTool
+# AiTool 2.0
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18.20.7-green)](https://nodejs.org/) [![npm](https://img.shields.io/badge/npm-v10.8.2-blue)](https://www.npmjs.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.20.7-green)](https://nodejs.org/) [![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black)](https://nextjs.org/) [![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
 
-## 介绍
+AiTool 2.0 是 Owen 的个人工具与工作网站：把正在做的 AI 产品、日常工具、App Store 上架材料、个人链接和长期记录收在同一个入口。
 
-AiTool 正在从“功能堆叠的 AI 工具箱”收敛成一个可持续使用的 AI 工作台，核心方向是把创作、学习、需求整理和个人资产沉淀放回同一套日常入口。
+线上地址：[https://owenshen.top](https://owenshen.top)
 
-当前项目主要包含这些能力：
+## 当前定位
 
-- **Workspace**：工作台首页、今日摘要、个性化首页模板与首页生成器
-- **Prompt**：提示词管理、案例调试、结构化记录
-- **Requirements**：站内需求看板、内容页与需求生命周期流转
-- **Audio / TTS**：文本转语音、流式语音能力接入
-- **Image / Video / Web Agent**：图像生成、视频配音、网页生成等 Agent 场景
-- **Docs**：日语笔记、Demo 内容等长期沉淀空间
-- **Files / Supplier Config**：文件工具、模型供应商与模型配置
+这个项目不再是旧版的“功能堆叠式工作台”，而是一个个人大杂烩式的长期站点：
 
-项目基于 **Next.js**、**TypeScript**、**Tailwind CSS**、**PostgreSQL** 构建，并集成了 Casdoor 认证。
+- **产品展示**：整理日语学习、亲人关系 AI 社交、AI Vlog、自进化 Agent 等方向。
+- **工具入口**：沉淀自己日常会用的模型接口、文件管理、Mermaid 预览等工具。
+- **公开记录**：按时间线公开记录每日总结、产品判断、旧内容补录和素材摘录。
+- **App Store 支持材料**：集中放隐私政策、支持页、条款、数据删除说明和上架检查清单。
+- **个人链接**：把常用站点、产品入口和公开资料整理成自己的工作导航。
 
 ## 功能概览
 
-### 工作台
+### 首页与个人站点
 
-- 默认承接登录后的主入口
-- 展示需求脉搏、AI 每日摘要和建议下一步
-- 支持生活 / 学习 / 工作 / 综合四类个性首页模板
+- `/`：个人介绍与 4 条主要产品方向。
+- `/products`：产品目录与 App Store 相关入口。
+- `/links`：个人常用链接与站点导航。
+- `/roadmap`：产品和站点后续规划。
 
-### Prompt
+### 工具箱
 
-- 提示词树形管理与编辑
-- Prompt case 对比调试
-- 配套目录、内容与元数据管理
+- `/tools`：AiTool 2.0 工具入口。
+- `/tools/api-lab`：统一的模型接口实验室，后续承接文本、图片、语音、文件等供应商能力。
+- `/tools/mermaid`：Mermaid 在线查看与调试。
+- `/stepfun/file`：保留的历史文件管理工具入口，仅作为兼容工具继续使用。
 
-### Requirements
+### 公开记录
 
-- 需求看板与需求内容页
-- 待处理、梳理、待开始、开发中、验证中、已归档等状态流转
-- 与工作台摘要联动
+- `/notes`：公开时间线，默认按日期倒序展示记录。
+- `/api/notes/daily`：每日记录 API，支持读取公开记录与登录后写入。
+- 记录支持 `daily`、`memory`、`product`、`clip`、`learning`、`other` 等类型。
+- 正文支持 Markdown，扩展块支持图片、音频、视频、B 站 / YouTube 嵌入和外部链接。
 
-### Audio / TTS
+### App Store 材料
 
-- 流式 TTS 接口
-- 供应商、模型、音色配置
-- 适合作为日语学习和内容输出的语音承接层
-
-### Agent 场景
-
-- 图片生成 Agent
-- 视频配音 Agent
-- 网页生成 Agent
-- 行程 H5：公开旅行行程页，可按当前时间提示“现在该做什么”，并支持状态更新、备注和照片上传
-
-### 内容与工具
-
-- 日语笔记
-- Demo 内容页
-- 文件工具
+- `/legal/apple-privacy`：Apple App 隐私政策。
+- `/support`：App 支持页。
+- `/legal/terms`：服务条款。
+- `/legal/data-deletion`：数据删除说明。
+- `/legal/app-store-checklist`：App Store 上架材料检查清单。
 
 ## 技术栈
 
-- **框架**：Next.js 13 (App Router)
+- **框架**：Next.js 14 App Router
 - **语言**：TypeScript
 - **样式**：Tailwind CSS
-- **认证**：Casdoor
 - **数据库**：PostgreSQL (`pg` + `pgvector`)
+- **认证**：unified-app-backend
 - **实时能力**：WebSocket
+- **运行方式**：本地 Node.js / Docker Compose
 
-## 要求
+## 本地开发
 
-| 依赖项  | 版本要求   |
-| ------- | ---------- |
+### 依赖要求
+
+| 依赖项 | 版本要求 |
+| --- | --- |
 | Node.js | >= 18.20.7 |
-| npm     | >= 10.8.2  |
+| npm | >= 10.8.2 |
 
-## 安装
+### 安装
 
 ```bash
 git clone https://github.com/owenshen0907/AiTool.git
@@ -81,31 +74,89 @@ cd AiTool
 npm install
 ```
 
-## 开发
+### 环境变量
 
-- 启动开发服务器（会先执行数据库初始化）
+项目默认读取根目录的 `.env.local`。最少需要配置数据库：
+
+```env
+DATABASE_URL=postgres://username:password@localhost:5432/aitool
+```
+
+如果需要启用登录、写入记录或受保护接口，需要配置 unified-app-backend：
+
+```env
+UNIFIED_APP_BACKEND_URL=https://appapi.example.com
+NEXT_PUBLIC_UNIFIED_APP_BACKEND_URL=https://appapi.example.com
+
+UNIFIED_APP_CODE=aitool
+NEXT_PUBLIC_UNIFIED_APP_CODE=aitool
+
+UNIFIED_APP_NAME=AiTool 2.0
+NEXT_PUBLIC_UNIFIED_APP_NAME=AiTool 2.0
+
+UNIFIED_APP_BUNDLE_ID=top.owenshen.aitool
+NEXT_PUBLIC_UNIFIED_APP_BUNDLE_ID=top.owenshen.aitool
+
+NEXT_PUBLIC_APP_URL=http://localhost:3002
+```
+
+公开记录默认会优先读取下面两个变量指定的用户；未配置时，会回退到昵称为 `欧文` 的用户：
+
+```env
+AITOOL_PUBLIC_NOTES_USER_ID=your_user_id
+# 或
+PUBLIC_NOTES_USER_ID=your_user_id
+```
+
+### 启动
+
+开发服务器默认跑在 `3002` 端口，并会先执行数据库初始化：
 
 ```bash
 npm run dev
 ```
 
-- 构建生产版本
+生产构建：
 
 ```bash
 npm run build
-```
-
-- 启动生产服务
-
-```bash
 npm run start
 ```
 
-- 单独执行数据库初始化脚本
+单独执行数据库初始化：
 
 ```bash
 npm run init-db
 ```
+
+## 数据与记录 API
+
+读取公开记录：
+
+```bash
+curl http://localhost:3002/api/notes/daily
+```
+
+按日期读取：
+
+```bash
+curl "http://localhost:3002/api/notes/daily?date=2026-05-01"
+```
+
+写入或更新每日总结需要登录态，请求体示例：
+
+```json
+{
+  "noteDate": "2026-05-01",
+  "title": "开始运营 X 的第一天",
+  "summary": "今天把对外表达正式拉起来。",
+  "contentMarkdown": "今天做了什么...",
+  "tags": ["daily", "X运营", "产品记录"],
+  "status": "published"
+}
+```
+
+每日总结会使用 `daily:YYYY-MM-DD` 作为默认 `noteKey`，便于 Codex 或其他自动化流程幂等更新。
 
 ## 项目结构
 
@@ -113,61 +164,43 @@ npm run init-db
 AiTool/
 ├── src/
 │   ├── app/
-│   │   ├── workspace/           # 工作台与首页生成器
-│   │   ├── prompt/              # Prompt 管理与 case 调试
-│   │   ├── requirements/        # 需求看板与内容页
-│   │   ├── audio/tts/           # TTS 页面
-│   │   ├── agent/               # 图片 / 视频 / 网页 Agent
-│   │   ├── docs/                # 日语笔记、Demo 等内容页
-│   │   ├── stepfun/file/        # 文件工具
-│   │   └── api/                 # App Router API
+│   │   ├── page.tsx                 # 首页
+│   │   ├── tools/                   # 工具箱与 API Lab / Mermaid
+│   │   ├── notes/                   # 公开记录页
+│   │   ├── products/                # 产品目录
+│   │   ├── legal/                   # 隐私政策、条款、检查清单
+│   │   ├── support/                 # App 支持页
+│   │   ├── stepfun/file/            # 保留的历史文件管理入口
+│   │   └── api/                     # App Router API
 │   ├── lib/
-│   │   ├── api/                 # 前端 API 封装
-│   │   ├── auth/                # 登录与鉴权辅助
-│   │   ├── db/                  # 数据库连接与初始化
-│   │   ├── repositories/        # 数据访问层
-│   │   ├── services/            # 业务逻辑层
-│   │   ├── openai/              # 模型调用与封装
-│   │   └── ws/                  # WebSocket 客户端能力
-│   └── ...
-├── pages/api/                   # 兼容 pages router 的少量 API
-├── public/                      # 静态资源
-├── docs/                        # 设计与运维文档
+│   │   ├── auth/                    # unified-app-backend 鉴权
+│   │   ├── db/                      # 数据库连接、初始化和迁移
+│   │   ├── repositories/            # 数据访问层
+│   │   ├── models/                  # 类型定义
+│   │   └── ws/                      # WebSocket 能力
+│   └── config.ts                    # 站点与后端配置
+├── public/                          # 静态资源与上传文件
+├── docker-compose.yml
+├── Dockerfile
 ├── package.json
 └── README.md
 ```
 
-## 环境变量
+## 部署
 
-项目默认从根目录的 `.env.local` 读取配置，至少需要：
+项目可以通过 Docker Compose 部署，默认将 Next.js 服务暴露在 `3000` 端口：
 
-```env
-DATABASE_URL=postgres://username:password@localhost:5432/your_db
-
-CASDOOR_ENDPOINT=https://your-casdoor-domain.com
-CASDOOR_CLIENT_ID=your_client_id
-CASDOOR_CLIENT_SECRET=your_client_secret
+```bash
+docker compose up -d --build aitool
+docker exec aitool npm run init-db
 ```
 
-如果你要启用公开的旅行 H5 链接，额外补两项：
+生产环境建议：
 
-```env
-TRIP_XIAN_VIEW_TOKEN=replace-with-a-long-view-token
-TRIP_XIAN_EDIT_TOKEN=replace-with-a-long-edit-token
-```
-
-旅行样例数据位于 `src/lib/trip/data/xian.ts`，页面入口是 `/trip/xian?token=...`。
-
-如果你要初始化数据库，请确保 `DATABASE_URL` 指向正确实例，并在执行 `npm run init-db` 前确认环境。
-
-## 调试
-
-在浏览器开发者工具中执行下面的代码，可以开启请求日志：
-
-```javascript
-localStorage.setItem('FETCH_DEBUG', '1');
-location.reload();
-```
+- 使用 Nginx / HTTPS 反向代理到容器 `3000` 端口。
+- `.env.local` 只保存在服务器，不提交到仓库。
+- 部署前先确认 `DATABASE_URL` 指向正确的生产数据库。
+- Casdoor 已不再作为本项目登录依赖。
 
 ## 许可证
 
