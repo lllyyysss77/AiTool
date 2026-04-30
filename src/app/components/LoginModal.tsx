@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Loader2, LockKeyhole, Mail, UserRound, X } from 'lucide-react';
 import { useUser } from '@/app/providers/UserProvider';
@@ -17,6 +17,19 @@ interface AuthResponse {
     ok?: boolean;
     msg?: string;
     redirectTo?: string;
+}
+
+interface HumanChallenge {
+    challengeToken: string;
+    expiresAt: string;
+    minDurationMs: number;
+    minDragDistance: number;
+    message?: string;
+}
+
+interface HumanVerification {
+    humanToken: string;
+    expiresAt: string;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,6 +54,118 @@ export default function LoginModal() {
     const [registerDisplayName, setRegisterDisplayName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [humanChallenge, setHumanChallenge] = useState<HumanChallenge | null>(null);
+    const [humanToken, setHumanToken] = useState('');
+    const [humanTokenExpiresAt, setHumanTokenExpiresAt] = useState('');
+    const [humanSliderValue, setHumanSliderValue] = useState(0);
+    const [humanStatus, setHumanStatus] = useState('拖动滑块到最右侧，完成真人验证。');
+    const [isHumanLoading, setIsHumanLoading] = useState(false);
+    const [isHumanVerifying, setIsHumanVerifying] = useState(false);
+    const humanDragRef = useRef({ startedAt: 0, moves: 0, pointerType: 'pointer' });
+    const humanSliderValueRef = useRef(0);
+    const humanVerifyInFlightRef = useRef(false);
+
+    const isHumanVerified = useCallback(() => {
+        if (!humanToken) return false;
+
+        const expiresAt = Date.parse(humanTokenExpiresAt || '');
+        return Number.isFinite(expiresAt) && expiresAt > Date.now() + 60_000;
+    }, [humanToken, humanTokenExpiresAt]);
+
+    const clearHumanVerification = useCallback((message = '拖动滑块到最右侧，完成真人验证。') => {
+        setHumanToken('');
+        setHumanTokenExpiresAt('');
+        setHumanSliderValue(0);
+        humanSliderValueRef.current = 0;
+        setHumanStatus(message);
+    }, []);
+
+    const loadHumanChallenge = useCallback(async (force = false) => {
+        if (!force && humanChallenge) {
+            const expiresAt = Date.parse(humanChallenge.expiresAt || '');
+            if (Number.isFinite(expiresAt) && expiresAt > Date.now() + 10_000) {
+                return humanChallenge;
+            }
+        }
+
+        setIsHumanLoading(true);
+        try {
+            const response = await fetch('/api/auth/human/challenge', {
+                method: 'GET',
+                cache: 'no-store',
+            });
+            const payload = (await response.json().catch(() => null)) as
+                | (HumanChallenge & { msg?: string })
+                | null;
+
+            if (!response.ok || !payload?.challengeToken) {
+                throw new Error(payload?.msg || '真人验证初始化失败');
+            }
+
+            setHumanChallenge(payload);
+            if (!isHumanVerified()) {
+                setHumanSliderValue(0);
+                humanSliderValueRef.current = 0;
+                setHumanStatus(payload.message || '拖动滑块到最右侧，完成真人验证。');
+            }
+            return payload;
+        } finally {
+            setIsHumanLoading(false);
+        }
+    }, [humanChallenge, isHumanVerified]);
+
+    const verifyHuman = useCallback(async () => {
+        if (humanVerifyInFlightRef.current || isHumanVerified()) return;
+
+        humanVerifyInFlightRef.current = true;
+        setIsHumanVerifying(true);
+        setHumanStatus('正在确认真人验证...');
+
+        try {
+            const challenge = await loadHumanChallenge();
+            const startedAt = humanDragRef.current.startedAt || Date.now() - challenge.minDurationMs;
+            const durationMs = Math.max(Date.now() - startedAt, challenge.minDurationMs + 120);
+            const dragDistance = Math.max(challenge.minDragDistance + 24, 140);
+
+            const response = await fetch('/api/auth/human/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    challengeToken: challenge.challengeToken,
+                    durationMs,
+                    dragDistance,
+                    pointerMoves: Math.max(humanDragRef.current.moves, 3),
+                    pointerType: humanDragRef.current.pointerType,
+                }),
+            });
+            const payload = (await response.json().catch(() => null)) as
+                | (HumanVerification & { msg?: string })
+                | null;
+
+            if (!response.ok || !payload?.humanToken) {
+                throw new Error(payload?.msg || '真人验证失败，请重试');
+            }
+
+            setHumanToken(payload.humanToken);
+            setHumanTokenExpiresAt(payload.expiresAt);
+            setHumanSliderValue(100);
+            humanSliderValueRef.current = 100;
+            setHumanStatus('验证完成，登录请求会使用 unified-app-backend 的人机令牌。');
+        } catch (error) {
+            setHumanChallenge(null);
+            clearHumanVerification(error instanceof Error ? error.message : '真人验证失败，请重试');
+        } finally {
+            humanVerifyInFlightRef.current = false;
+            setIsHumanVerifying(false);
+        }
+    }, [clearHumanVerification, isHumanVerified, loadHumanChallenge]);
+
+    useEffect(() => {
+        if (!modalOpen || user || isHumanVerified()) return;
+        void loadHumanChallenge().catch((error) => {
+            setHumanStatus(error instanceof Error ? error.message : '真人验证初始化失败');
+        });
+    }, [isHumanVerified, loadHumanChallenge, modalOpen, user]);
 
     useEffect(() => {
         if (!modalOpen) return;
@@ -74,8 +199,8 @@ export default function LoginModal() {
     const description = useMemo(
         () =>
             mode === 'login'
-                ? '直接在当前弹层输入邮箱或用户名和密码登录，成功后会回到刚才正在访问的页面。'
-                : '注册会直接通过 Casdoor API 创建账号，并在成功后自动登录，不再跳转到外部页面。',
+                ? '直接在当前弹层输入邮箱和密码登录，成功后会回到刚才正在访问的页面。'
+                : '注册会通过 unified-app-backend 创建账号，并在成功后自动登录，不再跳转到外部页面。',
         [mode]
     );
 
@@ -96,8 +221,10 @@ export default function LoginModal() {
 
     const validateClientSide = () => {
         if (mode === 'login') {
-            if (!loginIdentifier.trim()) return '请输入邮箱或用户名';
+            if (!loginIdentifier.trim()) return '请输入邮箱';
+            if (!EMAIL_REGEX.test(loginIdentifier.trim())) return '邮箱格式不正确';
             if (!loginPassword) return '请输入密码';
+            if (!isHumanVerified()) return '请先拖动滑块完成人机验证';
             return '';
         }
 
@@ -106,6 +233,7 @@ export default function LoginModal() {
         if (!registerPassword) return '请输入密码';
         if (registerPassword.length < 8) return '密码至少需要 8 位';
         if (registerPassword !== registerConfirmPassword) return '两次输入的密码不一致';
+        if (!isHumanVerified()) return '请先拖动滑块完成人机验证';
         return '';
     };
 
@@ -127,8 +255,9 @@ export default function LoginModal() {
             const payload =
                 mode === 'login'
                     ? {
-                          identifier: loginIdentifier.trim(),
+                          email: loginIdentifier.trim().toLowerCase(),
                           password: loginPassword,
+                          humanToken,
                           next: nextUrl,
                       }
                     : {
@@ -136,6 +265,7 @@ export default function LoginModal() {
                           password: registerPassword,
                           confirmPassword: registerConfirmPassword,
                           displayName: registerDisplayName.trim(),
+                          humanToken,
                           next: nextUrl,
                       };
 
@@ -149,7 +279,15 @@ export default function LoginModal() {
 
             const result = (await response.json().catch(() => null)) as AuthResponse | null;
             if (!response.ok || !result?.ok) {
-                setErrorMessage(result?.msg || (mode === 'login' ? '登录失败' : '注册失败'));
+                const message = result?.msg || (mode === 'login' ? '登录失败' : '注册失败');
+                if (message.includes('真人') || message.includes('人机') || message.toLowerCase().includes('human')) {
+                    setHumanChallenge(null);
+                    clearHumanVerification('真人验证已失效，请重新拖动滑块。');
+                    void loadHumanChallenge(true).catch((error) => {
+                        setHumanStatus(error instanceof Error ? error.message : '真人验证初始化失败');
+                    });
+                }
+                setErrorMessage(message);
                 return;
             }
 
@@ -204,7 +342,7 @@ export default function LoginModal() {
                                 统一身份认证入口
                             </div>
                             <p className="max-w-xl text-lg leading-8 text-[#5c769b]">
-                                登录后直接进入 Prompt 管理、知识库与 Agent 工作台。认证交互在站内完成，不再跳去 Casdoor 页面。
+                                登录后进入个人工具站和需要权限的工具入口。认证交互在站内完成，并由 unified-app-backend 统一签发会话。
                             </p>
                         </div>
                     </div>
@@ -270,7 +408,7 @@ export default function LoginModal() {
 
                                 <label className="mb-5 block">
                                     <span className="mb-3 block text-lg font-medium text-[#4b678f]">
-                                        {mode === 'login' ? '邮箱 / 用户名' : '邮箱'}
+                                        邮箱
                                     </span>
                                     <div className="flex h-20 items-center rounded-[999px] border border-[#c4d2e5] bg-white px-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                                         <Mail size={20} className="mr-4 text-[#86a0c4]" />
@@ -281,10 +419,10 @@ export default function LoginModal() {
                                                     ? setLoginIdentifier(event.target.value)
                                                     : setRegisterEmail(event.target.value)
                                             }
-                                            placeholder={mode === 'login' ? '请输入邮箱或用户名' : '请输入邮箱'}
+                                            placeholder="请输入邮箱"
                                             className="h-full w-full bg-transparent text-[18px] text-[#173b6d] outline-none placeholder:text-[#9aaec9]"
-                                            autoComplete={mode === 'login' ? 'username' : 'email'}
-                                            inputMode={mode === 'login' ? 'text' : 'email'}
+                                            autoComplete="email"
+                                            inputMode="email"
                                         />
                                     </div>
                                 </label>
@@ -331,6 +469,81 @@ export default function LoginModal() {
                                     </label>
                                 )}
 
+                                <div className="mb-5 rounded-[28px] border border-[#c4d2e5] bg-white/75 px-5 py-4 shadow-sm">
+                                    <div className="mb-3 flex items-center justify-between gap-3 text-sm text-[#5f789f]">
+                                        <span className="font-semibold text-[#365d91]">真人验证</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                clearHumanVerification();
+                                                void loadHumanChallenge(true).catch((error) => {
+                                                    setHumanStatus(error instanceof Error ? error.message : '真人验证初始化失败');
+                                                });
+                                            }}
+                                            disabled={isSubmitting || isHumanLoading || isHumanVerifying}
+                                            className="text-[#295b9a] transition hover:text-[#173b6d] disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            重新验证
+                                        </button>
+                                    </div>
+                                    <div className="relative h-14 overflow-hidden rounded-full border border-[#bdd0eb] bg-[#edf4ff]">
+                                        <div
+                                            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#c9dbf7] to-[#9fbceb] transition-[width]"
+                                            style={{ width: `${humanSliderValue}%` }}
+                                        />
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={100}
+                                            value={humanSliderValue}
+                                            onPointerDown={(event) => {
+                                                if (isHumanVerified()) return;
+                                                humanDragRef.current = {
+                                                    startedAt: Date.now(),
+                                                    moves: 0,
+                                                    pointerType: event.pointerType || 'pointer',
+                                                };
+                                                setHumanStatus('继续拖到最右侧完成验证。');
+                                                if (!humanChallenge) {
+                                                    void loadHumanChallenge().catch((error) => {
+                                                        setHumanStatus(error instanceof Error ? error.message : '真人验证初始化失败');
+                                                    });
+                                                }
+                                            }}
+                                            onPointerUp={() => {
+                                                if (!isHumanVerified() && humanSliderValueRef.current < 100) {
+                                                    setHumanStatus('还没有拖到最右侧，请继续拖动。');
+                                                }
+                                            }}
+                                            onChange={(event) => {
+                                                if (isHumanVerified()) return;
+                                                const nextValue = Number(event.target.value);
+                                                humanSliderValueRef.current = nextValue;
+                                                humanDragRef.current.moves += 1;
+                                                setHumanSliderValue(nextValue);
+                                                if (nextValue >= 100) {
+                                                    void verifyHuman();
+                                                } else if (nextValue > 0) {
+                                                    setHumanStatus('继续拖到最右侧完成验证。');
+                                                }
+                                            }}
+                                            disabled={isSubmitting || isHumanLoading || isHumanVerifying || isHumanVerified()}
+                                            className="absolute inset-0 z-10 h-full w-full cursor-pointer bg-transparent px-3 accent-[#537fbd] disabled:cursor-not-allowed"
+                                            aria-label="拖动滑块完成真人验证"
+                                        />
+                                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#426899]">
+                                            {isHumanLoading
+                                                ? '正在准备验证...'
+                                                : isHumanVerifying
+                                                  ? '验证中...'
+                                                  : isHumanVerified()
+                                                    ? '已完成验证'
+                                                    : '拖动到最右侧'}
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 text-sm leading-6 text-[#6d84a9]">{humanStatus}</div>
+                                </div>
+
                                 {errorMessage && (
                                     <div className="mb-5 rounded-[24px] border border-red-200 bg-red-50 px-5 py-4 text-[15px] text-red-600">
                                         {errorMessage}
@@ -367,7 +580,7 @@ export default function LoginModal() {
                                 </div>
 
                                 <div className="mt-6 text-sm leading-7 text-[#7a90b1]">
-                                    登录即表示继续使用当前工作台。认证成功后将返回：
+                                    登录即表示继续使用当前工具站。认证成功后将返回：
                                     <span className="ml-2 font-mono text-[#47648f] break-all">
                                         {nextUrl}
                                     </span>

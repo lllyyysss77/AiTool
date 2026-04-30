@@ -46,18 +46,18 @@ function HoverMenu({
 
     const panelClass = isRoot
         ? 'left-1/2 top-full mt-3 w-64 -translate-x-1/2'
-        : 'left-full top-0 ml-1 w-60';
+        : 'left-full top-0 ml-2 w-60';
 
     const triggerClass = isRoot
         ? `relative inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
               active || open
                   ? 'bg-white/80 text-slate-900 shadow-[0_10px_30px_rgba(15,23,42,0.10)]'
-                  : 'text-slate-600 hover:bg-white/65 hover:text-slate-900'
+                  : 'text-slate-600 hover:bg-white/[0.76] hover:text-slate-900'
           }`
         : `flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-sm transition-all duration-200 ${
               active
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                  ? 'bg-slate-900 text-white shadow-[0_10px_28px_rgba(15,23,42,0.16)]'
+                  : 'text-slate-600 hover:bg-white/[0.92] hover:text-slate-900'
           }`;
 
     return (
@@ -76,7 +76,7 @@ function HoverMenu({
 
             {item.children ? (
                 <ul
-                    className={`absolute ${panelClass} rounded-[28px] border border-white/70 bg-white/78 p-2 shadow-[0_22px_70px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-200 origin-top ${open ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}
+                    className={`absolute ${panelClass} rounded-[28px] border border-white/75 bg-white/[0.88] p-2 shadow-[0_22px_70px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 backdrop-blur-2xl transition-all duration-200 origin-top supports-[backdrop-filter]:bg-white/[0.74] ${open ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}
                     style={{ zIndex: 80 + level }}
                 >
                     {item.children.map((child) => (
@@ -105,8 +105,6 @@ export default function NavBar() {
 
     if (
         pathname === '/login-confirm' ||
-        pathname === '/api-lab' ||
-        pathname?.startsWith('/api-lab/') ||
         pathname === '/trip' ||
         pathname?.startsWith('/trip/')
     ) {
@@ -125,19 +123,19 @@ export default function NavBar() {
 
     return (
         <>
-            <div className="sticky top-0 z-[90] px-3 pt-3 md:px-5">
-                <nav className="mx-auto flex max-w-7xl items-center gap-3 rounded-[30px] border border-white/65 bg-[linear-gradient(180deg,rgba(255,255,255,0.82)_0%,rgba(244,247,251,0.70)_100%)] px-3 py-3 shadow-[0_18px_60px_rgba(15,23,42,0.10)] backdrop-blur-2xl md:px-4">
+            <div className="sticky top-0 z-[90] border-b border-slate-900/10 bg-[linear-gradient(180deg,rgba(248,250,252,0.94)_0%,rgba(241,245,249,0.86)_100%)] shadow-[0_12px_38px_rgba(15,23,42,0.06)] backdrop-blur-2xl">
+                <nav className="mx-auto flex min-h-[76px] max-w-7xl items-center gap-3 px-4 py-3 md:px-8">
                     <Link
                         href="/"
                         className="flex shrink-0 items-center gap-3 rounded-[22px] px-2 py-1.5 transition hover:bg-white/70"
                     >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#0f172a_0%,#334155_55%,#64748b_100%)] text-white shadow-[0_10px_30px_rgba(15,23,42,0.20)]">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#20342b_0%,#5f6b3f_55%,#d49b42_100%)] text-white shadow-[0_10px_30px_rgba(15,23,42,0.20)]">
                             <Sparkles size={18} />
                         </div>
                         <div className="hidden sm:block">
-                            <div className="text-lg font-semibold tracking-tight text-slate-900">AiTool</div>
+                            <div className="text-lg font-semibold tracking-tight text-slate-900">AiTool 2.0</div>
                             <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                                AI 工作台
+                                Personal Toolbox
                             </div>
                         </div>
                     </Link>
@@ -174,7 +172,7 @@ export default function NavBar() {
                             >
                                 <button
                                     type="button"
-                                    className="flex items-center gap-3 rounded-full border border-white/65 bg-white/70 px-2 py-2 pr-3 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:bg-white"
+                                className="flex items-center gap-3 rounded-full border border-white/[0.72] bg-white/75 px-2 py-2 pr-3 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition hover:bg-white"
                                 >
                                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#2563eb_0%,#0f172a_100%)] text-sm font-semibold text-white">
                                         {firstChar}
@@ -192,7 +190,7 @@ export default function NavBar() {
                                 </button>
 
                                 {
-                                    <div className={`absolute right-0 top-full mt-3 w-60 rounded-[28px] border border-white/70 bg-white/80 p-2 shadow-[0_22px_70px_rgba(15,23,42,0.16)] backdrop-blur-2xl transition-all duration-200 origin-top-right ${dropdownOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}>
+                                    <div className={`absolute right-0 top-full mt-3 w-60 rounded-[28px] border border-white/75 bg-white/[0.9] p-2 shadow-[0_22px_70px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 backdrop-blur-2xl transition-all duration-200 origin-top-right supports-[backdrop-filter]:bg-white/[0.76] ${dropdownOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}>
                                         <button
                                             type="button"
                                             className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-white hover:text-slate-900"
@@ -237,7 +235,7 @@ export default function NavBar() {
                             <Link
                                 href={loginHref}
                                 scroll={false}
-                                className="inline-flex h-11 items-center rounded-full border border-white/70 bg-[linear-gradient(135deg,#0f172a_0%,#334155_100%)] px-5 text-sm font-medium text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)] transition hover:opacity-92"
+                                className="inline-flex h-11 items-center rounded-full border border-white/70 bg-[linear-gradient(135deg,#0f172a_0%,#334155_100%)] px-5 text-sm font-medium text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)] transition hover:opacity-[0.92]"
                             >
                                 登录
                             </Link>

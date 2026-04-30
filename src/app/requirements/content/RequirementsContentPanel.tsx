@@ -664,14 +664,14 @@ export default function RequirementsContentPanel({
 {`# 元信息
 - 类型: 功能
 - 优先级: P1
-- 相关路由: /workspace`}
+- 相关路由: /tools`}
                             </pre>
                         </div>
                         <div className="mt-4 rounded-[20px] border border-white/10 bg-white/5 px-4 py-3 text-sm leading-7 text-slate-200">
                             看板预览会从这些章节抽取：
                             <pre className="mt-3 whitespace-pre-wrap text-xs leading-6 text-slate-300">
 {`# 场景
-- 工作台里的需求看板
+- 工具站里的需求看板
 
 # 预期价值
 - 让看板能直接展示这条需求解决了什么问题

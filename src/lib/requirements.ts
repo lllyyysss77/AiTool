@@ -592,7 +592,7 @@ export function buildRequirementMetadataBlock(
     defaults: RequirementDocMetadata = {
         type: 'feature',
         priority: 'P1',
-        relatedRoute: '/workspace',
+        relatedRoute: '/tools',
     }
 ) {
     const type = defaults.type ?? 'feature';
@@ -601,7 +601,7 @@ export function buildRequirementMetadataBlock(
     return `# 元信息
 - 类型: ${requirementTypeMeta[type].label}
 - 优先级: ${priority}
-- 相关路由: ${defaults.relatedRoute ?? '/workspace'}`;
+- 相关路由: ${defaults.relatedRoute ?? '/tools'}`;
 }
 
 function normalizeSectionName(value: string) {

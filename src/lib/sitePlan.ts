@@ -49,11 +49,11 @@ export const systemPlan: SystemPlan = {
     updatedAt: '2026-03-11',
     title: 'AiTool 系统规划',
     summary:
-        '让 AiTool 从“功能堆叠的 AI 工具箱”收敛成一个面向创作、学习与个人资产沉淀的 AI 工作台。',
-    currentFocus: '工作台现在已经开始根据需求脉搏、系统规划和已应用的个性首页主轴生成启发式 AI 每日简报，并把来源卡片挂到摘要下方，让建议下一步、今日学习流和个性首页主轴收进同一个可解释的 daily context。下一步再继续把这套规则做成更稳定的个性化 daily brief。',
+        '让 AiTool 从“功能堆叠的 AI 工具箱”收敛成一个面向创作、学习与个人资产沉淀的 AI 工具站。',
+    currentFocus: '工具站现在已经开始根据需求脉搏、系统规划和已应用的个性首页主轴生成启发式 AI 每日简报，并把来源卡片挂到摘要下方，让建议下一步、今日学习流和个性首页主轴收进同一个可解释的 daily context。下一步再继续把这套规则做成更稳定的个性化 daily brief。',
     principles: [
         '先做稳定入口，再扩展能力，不继续横向铺新模块。',
-        '公开首页负责解释产品，登录后工作台负责承接日常使用。',
+        '公开首页负责解释产品，登录后工具站负责承接日常使用。',
         '每轮只推进一小步，并同步更新完成状态与下一步。',
     ],
     phases: [
@@ -64,7 +64,7 @@ export const systemPlan: SystemPlan = {
             tasks: [
                 {
                     title: '站内登录注册',
-                    note: '已完成弹层式登录注册与 Casdoor 回调收口。',
+                    note: '已完成弹层式登录注册，并切换到 unified-app-backend 统一认证。',
                     status: 'done' as const,
                 },
                 {
@@ -78,30 +78,30 @@ export const systemPlan: SystemPlan = {
                     status: 'done' as const,
                 },
                 {
-                    title: '导航收敛到工作台结构',
-                    note: '已加入工作台与系统规划入口，后续继续压缩旧菜单层级。',
+                    title: '导航收敛到工具站结构',
+                    note: '已保留工具、产品、记录、链接四个主入口，旧工作台入口已从导航移除。',
                     status: 'done' as const,
                 },
             ],
         },
         {
-            name: 'Phase 2 / 日常工作台',
+            name: 'Phase 2 / 日常工具站',
             goal: '让 AiTool 成为每天可打开的默认入口。',
             status: 'in_progress' as const,
             tasks: [
                 {
-                    title: '工作台首版',
-                    note: '已落地今日、快速记录、最近常用、固定入口，并补了今日日语预留位。',
+                    title: '工具站首版',
+                    note: '已收敛为工具、产品、记录、链接四个公开入口。',
                     status: 'done' as const,
                 },
                 {
-                    title: '登录成功默认跳转到工作台',
-                    note: '已将认证默认落点改为 /workspace，同时保留显式 next 路由覆盖。',
+                    title: '登录成功默认跳转到工具站',
+                    note: '已将认证默认落点改为 /tools，同时保留显式 next 路由覆盖。',
                     status: 'done' as const,
                 },
                 {
-                    title: '个性化首页模板与生成器',
-                    note: '已支持生活、学习、工作、综合模板，填写关键信息后可生成首页预览并应用到工作台。',
+                    title: '个人首页结构收敛',
+                    note: '旧首页定制器已清理，首页改为固定的个人工具站结构。',
                     status: 'done' as const,
                 },
                 {
@@ -118,12 +118,12 @@ export const systemPlan: SystemPlan = {
             tasks: [
                 {
                     title: '需求页面',
-                    note: '已落地首版页面骨架，包含状态列、seed 条目，以及从导航和工作台进入的入口。',
+                    note: '已落地首版页面骨架，包含状态列、seed 条目，以及从导航和工具站进入的入口。',
                     status: 'done' as const,
                 },
                 {
                     title: '需求生命周期',
-                    note: '继续固化待处理、需求梳理、待开始、开发中、验证中、已归档的字段与迁移规则；当前内容页和看板卡片迁移都已开始写入交接上下文，开发中 / 验证中也已显示新鲜度提示，并把实时状态同步到工作台的需求脉搏。',
+                    note: '继续固化待处理、需求梳理、待开始、开发中、验证中、已归档的字段与迁移规则；当前内容页和看板卡片迁移都已开始写入交接上下文，开发中 / 验证中也已显示新鲜度提示，并把实时状态同步到工具站的需求脉搏。',
                     status: 'in_progress' as const,
                 },
                 {
@@ -140,12 +140,12 @@ export const systemPlan: SystemPlan = {
             tasks: [
                 {
                     title: 'AI 每日摘要',
-                    note: '工作台已开始根据需求脉搏、建议下一步和已应用首页主轴生成启发式 AI 每日简报，并把来源卡片显式挂到摘要下方，后续再接更稳定的个性化每日简报。',
+                    note: '工具站已开始根据需求脉搏、建议下一步和已应用首页主轴生成启发式 AI 每日简报，并把来源卡片显式挂到摘要下方，后续再接更稳定的个性化每日简报。',
                     status: 'in_progress' as const,
                 },
                 {
                     title: '建议下一步',
-                    note: '工作台已开始根据需求脉搏和系统规划生成启发式下一步建议，后续再继续接 AI 推荐与自动推进。',
+                    note: '工具站已开始根据需求脉搏和系统规划生成启发式下一步建议，后续再继续接 AI 推荐与自动推进。',
                     status: 'in_progress' as const,
                 },
                 {

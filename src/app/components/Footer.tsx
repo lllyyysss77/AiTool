@@ -5,18 +5,19 @@ import { usePathname } from 'next/navigation';
 import { Github, Sparkles } from 'lucide-react';
 
 const footerLinks = [
-    { title: '工作台', href: '/workspace' },
-    { title: '提示词工作台', href: '/prompt/manage' },
-    { title: '需求看板', href: '/requirements' },
-    { title: '系统规划', href: '/roadmap' },
+    { title: '工具目录', href: '/tools' },
+    { title: '产品介绍', href: '/products' },
+    { title: '想法记录', href: '/notes' },
+    { title: '常用链接', href: '/links' },
+    { title: '支持', href: '/support' },
+    { title: '隐私政策', href: '/legal/apple-privacy' },
+    { title: '使用条款', href: '/legal/terms' },
 ];
 
 export default function Footer() {
     const pathname = usePathname();
 
     if (
-        pathname === '/api-lab' ||
-        pathname?.startsWith('/api-lab/') ||
         pathname === '/trip' ||
         pathname?.startsWith('/trip/')
     ) {
@@ -24,24 +25,24 @@ export default function Footer() {
     }
 
     return (
-        <footer className="border-t border-slate-200 bg-white/60 backdrop-blur-sm">
-            <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-10 md:flex-row md:justify-between md:py-12">
+        <footer className="border-t border-slate-900/10 bg-[linear-gradient(180deg,rgba(248,250,252,0.92)_0%,rgba(238,242,247,0.88)_100%)] backdrop-blur-sm">
+            <div className="mx-auto flex max-w-7xl flex-col gap-7 px-6 py-10 md:flex-row md:items-center md:justify-between md:py-12">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,#0f172a_0%,#334155_55%,#64748b_100%)] text-white">
-                        <Sparkles size={14} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-[linear-gradient(135deg,#20342b_0%,#5f6b3f_55%,#d49b42_100%)] text-white">
+                        <Sparkles size={15} />
                     </div>
                     <div>
-                        <div className="text-sm font-semibold tracking-tight text-slate-900">AiTool</div>
-                        <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400">AI 工作台</div>
+                        <div className="text-sm font-black tracking-tight text-slate-900">AiTool 2.0</div>
+                        <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Personal toolbox</div>
                     </div>
                 </div>
 
-                <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                <nav className="flex flex-wrap items-center gap-4 md:justify-center md:gap-6">
                     {footerLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-900"
+                            className="text-sm font-semibold text-slate-600 transition-colors duration-200 hover:text-slate-900"
                         >
                             {link.title}
                         </Link>
@@ -53,13 +54,13 @@ export default function Footer() {
                         href="https://github.com/owenshen0907/AiTool"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate-400 transition-colors duration-200 hover:text-slate-700"
+                        className="text-slate-600 transition-colors duration-200 hover:text-slate-900"
                         aria-label="GitHub"
                     >
                         <Github size={18} />
                     </a>
-                    <span className="text-xs text-slate-400">
-                        &copy; {new Date().getFullYear()} AiTool
+                    <span className="text-xs text-slate-500">
+                        &copy; {new Date().getFullYear()} Owen Shen
                     </span>
                 </div>
             </div>

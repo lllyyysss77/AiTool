@@ -1,30 +1,25 @@
-// File: middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { buildLoginModalHomePath } from '@/lib/auth/loginModal';
 
-/* ────────────────────────────── 工具函数 ────────────────────────────── */
 function decodeJwtPayload(token: string) {
-    const [, b64] = token.split('.');
-    // Use atob() — Edge Runtime compatible (Buffer is not available in Edge Runtime)
-    const json = atob(b64.replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(json);
+    const [, rawPayload] = token.split('.');
+    if (!rawPayload) return null;
+
+    const normalized = rawPayload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=');
+    return JSON.parse(atob(padded));
 }
+
 function isExpired(payload: any) {
-    return typeof payload.exp === 'number' && payload.exp * 1000 < Date.now();
+    return typeof payload?.exp === 'number' && payload.exp * 1000 < Date.now();
 }
 
-/* ────────────────────────────── 中间件主体 ────────────────────────────── */
 export function middleware(request: NextRequest) {
-    const { pathname, origin, hostname, search } = request.nextUrl;
+    const { pathname, origin, search } = request.nextUrl;
 
-    /* 0️⃣ 放行  ── 登录域名（Casdoor 自己的页面） */
-    const loginHost = process.env.NEXT_PUBLIC_LOGIN_URL!.replace(/^https?:\/\//, '');
-    if (hostname === loginHost) return NextResponse.next();
-
-    /* 1️⃣ 放行  ── 认证相关 API、静态资源、公开页面 */
     if (
-        pathname.startsWith('/api/auth/') ||               // Casdoor callback & logout
+        pathname.startsWith('/api/auth/') ||
         pathname.startsWith('/api/public/trip/') ||
         pathname === '/' ||
         pathname === '/trip' ||
@@ -39,12 +34,11 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    /* 2️⃣ 鉴权检查 ── 读取 Cookie 中的 sessionToken */
     const token = request.cookies.get('sessionToken')?.value;
     if (token) {
         try {
             const payload = decodeJwtPayload(token);
-            if (!isExpired(payload)) {
+            if (payload && !isExpired(payload)) {
                 const userId = payload.sub ?? payload.username;
                 if (userId) {
                     const headers = new Headers(request.headers);
@@ -53,20 +47,17 @@ export function middleware(request: NextRequest) {
                 }
             }
         } catch {
-            /* 解析失败视为未登录，继续下面逻辑 */
+            // Invalid token: clear it below and send the user back to the login modal.
         }
     }
 
-    /* 3️⃣ 未登录 ── 回到首页并拉起登录弹层 */
     const confirmUrl = new URL(buildLoginModalHomePath(`${pathname}${search}`), origin);
-
-    // 同时把失效 token 清掉，避免死循环
     const res = NextResponse.redirect(confirmUrl);
     res.cookies.set('sessionToken', '', { maxAge: 0, path: '/' });
+    res.cookies.set('userId', '', { maxAge: 0, path: '/' });
     return res;
 }
 
-/* 全站匹配 */
 export const config = {
     matcher: '/:path*',
 };

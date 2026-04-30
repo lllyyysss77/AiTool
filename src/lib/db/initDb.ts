@@ -4,10 +4,9 @@ import { pool } from './client.js';
 import { migrateCaseContent } from './migrations/caseContentMigration.js';
 import {docsJapaneseContent} from "./migrations/docsJapaneseMigration.js";
 import {dubbingContent} from "./migrations/dubbingMigration.js";
-import {imageGenerateContent} from "./migrations/imageGenerateMigration.js";
 import {demoContent} from "./migrations/demoMigration.js";
 import {requirementsContent} from "./migrations/requirementsMigration.js";
-import {migrateApiLab} from "./migrations/apiLabMigration.js";
+import {dailyNotesContent, ensureDailyNotesSchema} from "./migrations/dailyNotesMigration.js";
 
 async function tableExists(client: PoolClient, tableName: string) {
     const res = await client.query<{ exists: boolean }>(
@@ -338,12 +337,12 @@ CREATE INDEX IF NOT EXISTS idx_bad_cases_videos_gin
         }
 
         await runMigrationIfMissing(client, 'case_content', 'case content migration', migrateCaseContent);
-        await runMigrationIfMissing(client, 'api_lab_envs', 'API Lab migration', migrateApiLab);
         await runMigrationIfMissing(client, 'japanese_content', 'Japanese docs migration', docsJapaneseContent);
         await runMigrationIfMissing(client, 'dubbing_content', 'dubbing migration', dubbingContent);
-        await runMigrationIfMissing(client, 'imagegenerate_content', 'image generation migration', imageGenerateContent);
         await runMigrationIfMissing(client, 'demo_content', 'demo migration', demoContent);
         await runMigrationIfMissing(client, 'requirements_content', 'requirements migration', requirementsContent);
+        await runMigrationIfMissing(client, 'daily_notes', 'daily notes migration', dailyNotesContent);
+        await ensureDailyNotesSchema(client);
 
         console.log('Database initialized successfully.');
     } catch (err) {
@@ -355,5 +354,12 @@ CREATE INDEX IF NOT EXISTS idx_bad_cases_videos_gin
 
 // auto-run
 if (process.argv[1] === new URL(import.meta.url).pathname) {
-    initDb();
+    initDb()
+        .catch((error) => {
+            console.error('Database initialization failed:', error);
+            process.exitCode = 1;
+        })
+        .finally(async () => {
+            await pool.end();
+        });
 }

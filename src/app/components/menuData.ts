@@ -5,32 +5,29 @@ export interface MenuItem {
 }
 
 export const menuData: MenuItem[] = [
-    { title: '工作台', href: '/workspace' },
+    { title: '首页', href: '/' },
     {
-        title: '创作',
+        title: '工具',
+        href: '/tools',
         children: [
-            { title: '提示词工作台', href: '/prompt/manage' },
-            { title: '提示词调试', href: '/prompt/case' },
-            { title: '图片生成', href: '/agent/image/generate' },
-            { title: '配音生成', href: '/agent/video/dubbing' },
-            { title: '网页生成', href: '/agent/web/generate' },
-            { title: 'TTS 合成', href: '/audio/tts' },
+            { title: '工具目录', href: '/tools' },
+            { title: 'StepFun 文件管理', href: '/stepfun/file' },
+            { title: 'Mermaid 在线查看', href: '/tools/mermaid' },
+            { title: 'API Lab', href: '/tools/api-lab' },
         ],
     },
     {
-        title: '学习',
+        title: '产品',
+        href: '/products',
         children: [
-            { title: '日语笔记', href: '/docs/japanese' },
-            { title: '演示文档', href: '/docs/demo' },
+            { title: '产品介绍', href: '/products' },
+            { title: 'Apple 隐私政策', href: '/legal/apple-privacy' },
+            { title: '支持页面', href: '/support' },
+            { title: '使用条款', href: '/legal/terms' },
+            { title: '数据删除说明', href: '/legal/data-deletion' },
+            { title: '上架清单', href: '/legal/app-store-checklist' },
+            { title: '常用链接', href: '/links' },
         ],
     },
-    {
-        title: '资料库',
-        children: [
-            { title: '系统规划', href: '/roadmap' },
-            { title: '内部需求', href: '/requirements' },
-            { title: '首页定制', href: '/workspace/home-builder' },
-            { title: '文件工具', href: '/stepfun/file' },
-        ],
-    },
+    { title: '记录', href: '/notes' },
 ];

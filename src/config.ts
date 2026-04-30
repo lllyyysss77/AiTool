@@ -19,32 +19,23 @@ function readOptionalEnv(keys: string[], placeholders: string[] = []) {
     return value;
 }
 
-export const CASDOOR_CONFIG = {
-    endpoint:
-        readOptionalEnv(['CASDOOR_ENDPOINT', 'NEXT_PUBLIC_CASDOOR_ENDPOINT'], [
-            'https://your-casdoor-domain',
-        ]) || 'https://your-casdoor-domain',
-    clientId:
-        readOptionalEnv(['CASDOOR_CLIENT_ID', 'NEXT_PUBLIC_CASDOOR_CLIENT_ID'], [
-            'your_client_id',
-        ]) || 'your_client_id',
-    clientSecret: readOptionalEnv(
-        ['CASDOOR_CLIENT_SECRET', 'NEXT_PUBLIC_CASDOOR_CLIENT_SECRET'],
-        ['your_client_secret']
-    ),
+export const UNIFIED_BACKEND_CONFIG = {
+    baseUrl:
+        readOptionalEnv(['UNIFIED_APP_BACKEND_URL', 'NEXT_PUBLIC_UNIFIED_APP_BACKEND_URL'], [
+            'https://your-unified-backend-domain',
+        ]) || 'http://localhost:8787',
+    appCode:
+        readOptionalEnv(['UNIFIED_APP_CODE', 'NEXT_PUBLIC_UNIFIED_APP_CODE'], [
+            'your_app_code',
+        ]) || 'aitool',
     appName:
-        readOptionalEnv(['CASDOOR_APP_NAME', 'NEXT_PUBLIC_CASDOOR_APP_NAME'], [
+        readOptionalEnv(['UNIFIED_APP_NAME', 'NEXT_PUBLIC_UNIFIED_APP_NAME'], [
             'your_app_name',
-        ]) || 'your_app_name',
-    orgName:
-        readOptionalEnv(['CASDOOR_ORG_NAME', 'NEXT_PUBLIC_CASDOOR_ORG_NAME'], [
-            'your_org_name',
-        ]) || 'your_org_name',
-    redirectUri:
-        readOptionalEnv(
-            ['CASDOOR_REDIRECT_URI', 'NEXT_PUBLIC_CASDOOR_REDIRECT_URI'],
-            ['https://your-domain.com/api/auth/callback']
-        ) || 'https://your-domain.com/api/auth/callback',
+        ]) || 'AiTool 2.0',
+    bundleId:
+        readOptionalEnv(['UNIFIED_APP_BUNDLE_ID', 'NEXT_PUBLIC_UNIFIED_APP_BUNDLE_ID'], [
+            'your_bundle_id',
+        ]) || 'top.owenshen.aitool',
 };
 
 

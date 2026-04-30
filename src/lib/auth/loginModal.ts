@@ -1,6 +1,6 @@
 export const LOGIN_MODAL_QUERY_KEY = 'login';
 export const LOGIN_MODAL_NEXT_QUERY_KEY = 'loginNext';
-export const DEFAULT_POST_LOGIN_PATH = '/workspace';
+export const DEFAULT_POST_LOGIN_PATH = '/tools';
 
 function toSearchParams(search: string = '') {
     return new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
