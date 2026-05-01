@@ -1,12 +1,7 @@
 // lib/db/initDb.ts
 import type { PoolClient } from 'pg';
 import { pool } from './client.js';
-import { migrateCaseContent } from './migrations/caseContentMigration.js';
-import {docsJapaneseContent} from "./migrations/docsJapaneseMigration.js";
-import {dubbingContent} from "./migrations/dubbingMigration.js";
-import {demoContent} from "./migrations/demoMigration.js";
-import {requirementsContent} from "./migrations/requirementsMigration.js";
-import {dailyNotesContent, ensureDailyNotesSchema} from "./migrations/dailyNotesMigration.js";
+import { dailyNotesContent, ensureDailyNotesSchema } from './migrations/dailyNotesMigration.js';
 
 async function tableExists(client: PoolClient, tableName: string) {
     const res = await client.query<{ exists: boolean }>(
@@ -133,8 +128,8 @@ CREATE INDEX IF NOT EXISTS idx_voice_tones_supplier_id
 -- GIN 索引：加速按模型 ID 在 available_model_ids 中搜索
 CREATE INDEX IF NOT EXISTS idx_voice_tones_available_models_gin
   ON voice_tones USING GIN (available_model_ids);
-  
--- Agent配置  
+
+-- Agent配置
 -- Agent 场景配置表
 CREATE TABLE IF NOT EXISTS agent_scene_config (
     id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -185,23 +180,6 @@ BEGIN
 END;
 $$;
 
--- 数据库迁移脚本示例
-CREATE TABLE IF NOT EXISTS directories (
-  id          UUID          PRIMARY KEY,
-  feature     VARCHAR(50)   NOT NULL,           -- 功能区标识（比如 'case', 'prompt'…）
-  parent_id   UUID          NULL REFERENCES directories(id),
-  name        TEXT          NOT NULL,           -- 目录名称
-  position    INT           NOT NULL DEFAULT 0, -- 同级排序索引
-  created_by  VARCHAR(50)   NOT NULL,           -- 操作人 ID
-  created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
-);
-
--- 索引，按功能区+层级+顺序快速查询
-CREATE INDEX IF NOT EXISTS idx_directories_feature       ON directories(feature);
-CREATE INDEX IF NOT EXISTS idx_directories_parent_pos     ON directories(feature, parent_id, position);
-
-
 CREATE TABLE IF NOT EXISTS file_uploads (
   file_id        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),  -- 文件主键
   user_id        VARCHAR(50) NOT NULL,                              -- 文件所属/上传用户
@@ -213,9 +191,9 @@ CREATE TABLE IF NOT EXISTS file_uploads (
   file_size      BIGINT      NOT NULL,                              -- 文件大小（字节）
   form_id        TEXT,                                              -- 关联业务表单的 ID
 
-  -- 新增 origin 字段，限定为 'manual' 或 'ai'
+  -- origin 字段，限定为 'manual' 或 'ai'
   origin         TEXT        NOT NULL DEFAULT 'manual',
-  
+
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),                -- 上传时间
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),                -- 最近更新时间
 
@@ -229,118 +207,11 @@ CREATE TABLE IF NOT EXISTS file_uploads (
 CREATE INDEX IF NOT EXISTS idx_file_uploads_user     ON file_uploads(user_id);
 CREATE INDEX IF NOT EXISTS idx_file_uploads_module   ON file_uploads(module_name);
 CREATE INDEX IF NOT EXISTS idx_file_uploads_category ON file_uploads(file_category);
--- prompts 表
-CREATE TABLE IF NOT EXISTS prompts (
-    id           UUID PRIMARY KEY,
-    parent_id    UUID NULL,
-    type         VARCHAR(10) NOT NULL,
-    title        TEXT NOT NULL,
-    content      TEXT NULL,
-    description  TEXT NULL,
-    tags         JSONB NOT NULL DEFAULT '[]',
-    attributes   JSONB NOT NULL DEFAULT '[]',
-    comments     JSONB NULL,
-    is_public    BOOLEAN NOT NULL DEFAULT FALSE,
-    created_by   VARCHAR(50) NOT NULL REFERENCES user_info(user_id),
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    update_log   JSONB NULL,
-    position     INT NOT NULL DEFAULT 0
-);
-CREATE INDEX IF NOT EXISTS idx_prompts_parent_id  ON prompts(parent_id);
-CREATE INDEX IF NOT EXISTS idx_prompts_created_by ON prompts(created_by);
-CREATE INDEX IF NOT EXISTS idx_prompts_parent_pos ON prompts(parent_id, position);
-
-
--- 存储某个 Prompt 在生成时，所用到的原始输入数据
-CREATE TABLE IF NOT EXISTS prompt_generation_input_data (
-    id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-    prompt_id    UUID         NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
-    part_index   INT          NOT NULL,               -- 输入片段的顺序
-    part_type    VARCHAR(20)  NOT NULL,               -- 'text' | 'image_url' | 'video_url' | 'input_audio'
-    content      JSONB        NOT NULL,               -- 根据 part_type 存放对应 JSON
-    created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW()
-);
-
--- 按 prompt 快速查询
-CREATE INDEX IF NOT EXISTS idx_gen_input_data_prompt 
-  ON prompt_generation_input_data(prompt_id);
-
--- 保证同一 prompt 下 part_index 唯一
-CREATE UNIQUE INDEX IF NOT EXISTS idx_gen_input_data_order 
-  ON prompt_generation_input_data(prompt_id, part_index);
-  
--- Table: prompt_good_cases
-CREATE TABLE IF NOT EXISTS prompt_good_cases (
-  id           UUID              PRIMARY KEY DEFAULT gen_random_uuid(),
-  prompt_id    UUID              NOT NULL REFERENCES prompts(id),
-  user_input   TEXT              NOT NULL,
-  expected     TEXT              NOT NULL,
-  images       TEXT[]            DEFAULT '{}' ,
-  audios       TEXT[]            DEFAULT '{}',
-  videos       TEXT[]            DEFAULT '{}',
-  position     INT               NOT NULL DEFAULT 0,
-  notes        TEXT,
-  created_at   TIMESTAMPTZ       NOT NULL DEFAULT now(),
-  updated_at   TIMESTAMPTZ       NOT NULL DEFAULT now()
-);
-
--- Table: prompt_bad_cases
-CREATE TABLE IF NOT EXISTS prompt_bad_cases (
-  id           UUID              PRIMARY KEY DEFAULT gen_random_uuid(),
-  prompt_id    UUID              NOT NULL REFERENCES prompts(id),
-  user_input   TEXT              NOT NULL,
-  bad_output   TEXT              NOT NULL,
-  expected     TEXT              NOT NULL,
-  images       TEXT[]            DEFAULT '{}',
-  audios       TEXT[]            DEFAULT '{}',
-  videos       TEXT[]            DEFAULT '{}',
-  position     INT               NOT NULL DEFAULT 0,
-  error_type   VARCHAR(50),
-  notes        TEXT,
-  created_at   TIMESTAMPTZ       NOT NULL DEFAULT now(),
-  updated_at   TIMESTAMPTZ       NOT NULL DEFAULT now()
-);
-
--- Indexes for prompt_good_cases
-CREATE INDEX IF NOT EXISTS idx_good_cases_prompt_id
-  ON prompt_good_cases(prompt_id);
-CREATE INDEX IF NOT EXISTS idx_good_cases_created_at
-  ON prompt_good_cases(created_at);
-CREATE INDEX IF NOT EXISTS idx_good_cases_position
-  ON prompt_good_cases(position);
--- GIN index for array searches
-CREATE INDEX IF NOT EXISTS idx_good_cases_images_gin
-  ON prompt_good_cases USING GIN (images);
-CREATE INDEX IF NOT EXISTS idx_good_cases_audios_gin
-  ON prompt_good_cases USING GIN (audios);
-CREATE INDEX IF NOT EXISTS idx_good_cases_videos_gin
-  ON prompt_good_cases USING GIN (videos);
-
--- Indexes for prompt_bad_cases
-CREATE INDEX IF NOT EXISTS idx_bad_cases_prompt_id
-  ON prompt_bad_cases(prompt_id);
-CREATE INDEX IF NOT EXISTS idx_bad_cases_created_at
-  ON prompt_bad_cases(created_at);
-CREATE INDEX IF NOT EXISTS idx_bad_cases_position
-  ON prompt_bad_cases(position);
--- GIN index for array searches
-CREATE INDEX IF NOT EXISTS idx_bad_cases_images_gin
-  ON prompt_bad_cases USING GIN (images);
-CREATE INDEX IF NOT EXISTS idx_bad_cases_audios_gin
-  ON prompt_bad_cases USING GIN (audios);
-CREATE INDEX IF NOT EXISTS idx_bad_cases_videos_gin
-  ON prompt_bad_cases USING GIN (videos);
         `);
         } else {
             console.log('Core tables already exist, skipping base schema bootstrap.');
         }
 
-        await runMigrationIfMissing(client, 'case_content', 'case content migration', migrateCaseContent);
-        await runMigrationIfMissing(client, 'japanese_content', 'Japanese docs migration', docsJapaneseContent);
-        await runMigrationIfMissing(client, 'dubbing_content', 'dubbing migration', dubbingContent);
-        await runMigrationIfMissing(client, 'demo_content', 'demo migration', demoContent);
-        await runMigrationIfMissing(client, 'requirements_content', 'requirements migration', requirementsContent);
         await runMigrationIfMissing(client, 'daily_notes', 'daily notes migration', dailyNotesContent);
         await ensureDailyNotesSchema(client);
 

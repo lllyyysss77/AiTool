@@ -27,10 +27,10 @@ export default function RoadmapPage() {
                                     <ArrowRight size={16} />
                                 </Link>
                                 <Link
-                                    href="/prompt/manage"
+                                    href="/tools"
                                     className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
                                 >
-                                    进入提示词工作台
+                                    进入工具站
                                 </Link>
                             </div>
                         </div>
