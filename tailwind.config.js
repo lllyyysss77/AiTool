@@ -8,7 +8,8 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('daisyui')
+    require('daisyui'),
+    require('@tailwindcss/typography'),
   ],
   daisyui: {
     themes: ['light', 'dark'], // （可选）自定义主题列表

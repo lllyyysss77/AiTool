@@ -149,7 +149,7 @@ export default function NavBar() {
                 AiTool 2.0
               </div>
               <div className="font-data text-[10px] uppercase tracking-[0.18em] text-[#5d625a]">
-                AI Product OS
+                WORK NOTEBOOK
               </div>
             </div>
           </Link>

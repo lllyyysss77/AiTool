@@ -1,7 +1,6 @@
 // lib/db/initDb.ts
 import type { PoolClient } from 'pg';
 import { pool } from './client.js';
-import { dailyNotesContent, ensureDailyNotesSchema } from './migrations/dailyNotesMigration.js';
 
 async function tableExists(client: PoolClient, tableName: string) {
     const res = await client.query<{ exists: boolean }>(
@@ -14,21 +13,6 @@ async function tableExists(client: PoolClient, tableName: string) {
     );
 
     return Boolean(res.rows[0]?.exists);
-}
-
-async function runMigrationIfMissing(
-    client: PoolClient,
-    tableName: string,
-    label: string,
-    migration: (client: PoolClient) => Promise<void>,
-) {
-    if (await tableExists(client, tableName)) {
-        console.log(`Skipping ${label}, table "${tableName}" already exists.`);
-        return;
-    }
-
-    console.log(`Running ${label}...`);
-    await migration(client);
 }
 
 export async function initDb() {
@@ -211,9 +195,6 @@ CREATE INDEX IF NOT EXISTS idx_file_uploads_category ON file_uploads(file_catego
         } else {
             console.log('Core tables already exist, skipping base schema bootstrap.');
         }
-
-        await runMigrationIfMissing(client, 'daily_notes', 'daily notes migration', dailyNotesContent);
-        await ensureDailyNotesSchema(client);
 
         console.log('Database initialized successfully.');
     } catch (err) {

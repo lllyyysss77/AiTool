@@ -24,11 +24,8 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-import type { DailyNote } from "@/lib/models/dailyNote";
-import {
-  getPublicNotesUserId,
-  listDailyNotes,
-} from "@/lib/repositories/dailyNoteRepository";
+import { getAllPosts } from "@/lib/posts";
+import type { PostMeta } from "@/lib/posts/types";
 import AiosTicker from "./components/AiosTicker";
 
 export const dynamic = "force-dynamic";
@@ -56,36 +53,36 @@ type MemoryItem = {
 };
 
 const intentChips = [
-  { label: "我想看正在做的产品", href: "#product-streams" },
-  { label: "今天推进了什么", href: "#live-memory" },
-  { label: "App Store 材料在哪", href: "/legal/app-store-checklist" },
-  { label: "有哪些工具可用", href: "/tools" },
-  { label: "长期主线是什么", href: "#operating-loop" },
+  { label: "最近在做什么", href: "#product-streams" },
+  { label: "今天记了什么", href: "#live-memory" },
+  { label: "上架材料放哪了", href: "/legal/app-store-checklist" },
+  { label: "我常用哪些工具", href: "/tools" },
+  { label: "最长期的事是什么", href: "#operating-loop" },
 ];
 
 const systemSignals = [
-  { label: "Public Build", value: "X 运营启动", icon: Radio },
-  { label: "Release Prep", value: "日语 App 上架准备", icon: PackageOpen },
-  { label: "Core Engine", value: "evomap-farmer", icon: BrainCircuit },
+  { label: "公开记录", value: "开始认真写 X", icon: Radio },
+  { label: "上架准备", value: "日语 App 准备上线", icon: PackageOpen },
+  { label: "长期主线", value: "evomap-farmer", icon: BrainCircuit },
 ];
 
 const productStreams: ProductStream[] = [
   {
     id: "japanese-learning",
-    label: "Mainline 01",
+    label: "最近最重要",
     title: "日语学习工具体系",
     icon: Mic2,
     status: "App Store 准备中",
     mission:
-      "把输入、理解、练习和输出串成一个完整学习闭环，而不是继续堆孤立工具。",
+      "我学日语的时候一直觉得，单个工具解决不了问题。真正需要的是把听、懂、练、记串起来。",
     now: [
-      "语音方向正在准备备案与 App Store 上架。",
-      "学习助手承接单词、语法、翻译和笔记体系。",
-      "Web 词典继续推进图文解释能力。",
+      "语音对话练习的 App 已经在准备备案和 App Store 上架。",
+      "学习助手先把单词、语法、翻译和笔记这些每天会用的东西接住。",
+      "日语学习网站继续往前推，希望以后能把一个知识点讲得更清楚。",
     ],
     next: [
-      "补齐上架截图、隐私政策和支持 URL。",
-      "整理第一批可公开的学习内容和使用场景。",
+      "先把上架截图、隐私政策、支持页这些材料补齐。",
+      "再整理几组真实学习场景，方便自己测试，也方便以后对外说明。",
     ],
     artifacts: [
       { label: "隐私政策", href: "/legal/apple-privacy" },
@@ -97,17 +94,21 @@ const productStreams: ProductStream[] = [
   },
   {
     id: "family-ai",
-    label: "Stream 02",
+    label: "想法 02",
     title: "亲人关系的 AI 社交",
     icon: HeartHandshake,
     status: "概念验证",
-    mission: "不做泛社交，只做亲人之间更轻、更顺的表达和回应。",
+    mission:
+      "这个方向还很早，但我一直觉得亲人之间很多话不是不想说，而是说不好，或者没力气回。",
     now: [
-      "聚焦想表达但表达不好的人。",
-      "聚焦被需要但没有精力回应的人。",
-      "让 AI 帮关系变近，而不是把人推远。",
+      "先看那些想表达但总是表达不好的人。",
+      "也看那些被需要、但真的没有精力回应的人。",
+      "如果 AI 要介入关系，前提应该是让人更靠近，而不是更疏远。",
     ],
-    next: ["沉淀第一批真实沟通场景。", "定义隐私边界和本地优先的数据策略。"],
+    next: [
+      "先慢慢记一些真实沟通场景，不急着做大功能。",
+      "隐私边界要先想清楚，尤其是亲人关系里的内容。",
+    ],
     artifacts: [
       { label: "产品目录", href: "/products" },
       { label: "记录时间线", href: "/notes" },
@@ -117,20 +118,20 @@ const productStreams: ProductStream[] = [
   },
   {
     id: "ai-vlog",
-    label: "Stream 03",
+    label: "草稿 03",
     title: "AI Vlog 工作台",
     icon: Video,
     status: "工作流设计中",
     mission:
-      "用户只负责记录素材，AI 负责整理、规划结构，并把生活记录自动变成作品。",
+      "我自己也经常拍了很多东西，最后没有整理。这个方向想解决的是：先低成本记录，后面让 AI 帮我变成作品。",
     now: [
-      "输入形态先覆盖图片、音频和文字。",
-      "把素材整理、结构规划、剪辑成片拆成可复用流水线。",
-      "保持记录低摩擦，而不是让用户先学复杂编辑器。",
+      "先从图片、音频、文字这几类最容易留下来的素材开始。",
+      "再把整理、分镜、字幕、剪辑这些步骤拆出来。",
+      "重点不是再造一个复杂编辑器，而是让记录这件事更容易坚持。",
     ],
     next: [
-      "定义素材入库和自动分镜格式。",
-      "把视频生成供应商接入 API Lab 的实验层。",
+      "先定义素材怎么入库，自动分镜怎么描述。",
+      "相关的视频和语音模型，先都放到 API Lab 里试。",
     ],
     artifacts: [
       { label: "API Lab", href: "/tools/api-lab" },
@@ -141,20 +142,20 @@ const productStreams: ProductStream[] = [
   },
   {
     id: "self-evolving-agent",
-    label: "Long Run 04",
+    label: "长期 04",
     title: "自进化个人 Agent",
     icon: Bot,
     status: "长期主线",
     mission:
-      "围绕主流 Agent 做长期记忆和能力进化系统，为未来更高效开发新项目打底。",
+      "这是我最长期的方向。不是为了做一个单点功能，而是希望以后每次做项目都能少丢上下文。",
     now: [
-      "evomap-farmer 是当前核心项目。",
-      "重要信息优先沉淀在本地和可控系统里。",
-      "把每次开发经验变成下一次可复用的方法。",
+      "evomap-farmer 是现在最核心的一条线。",
+      "重要信息还是希望优先放在本地和自己可控的系统里。",
+      "每次开发、运营、踩坑都应该变成下一次能复用的东西。",
     ],
     next: [
-      "让记录页和工具页成为 Agent 的公开外部记忆。",
-      "把项目经验、供应商体验和构建过程持续结构化。",
+      "先让记录页和工具页承接一部分公开上下文。",
+      "再慢慢把项目经验、供应商体验和构建过程整理出来。",
     ],
     artifacts: [
       { label: "每日记录", href: "/notes" },
@@ -168,59 +169,59 @@ const productStreams: ProductStream[] = [
 
 const operatingLoop = [
   {
-    label: "Capture",
-    title: "记录现实素材",
-    body: "想法、截图、音频、App 上架材料和踩坑都先进入同一个低摩擦入口。",
+    label: "记录",
+    title: "先把事情记下来",
+    body: "想法、截图、音频、上架材料、踩坑，先别散在各处，能放进来就放进来。",
     icon: ScanSearch,
   },
   {
-    label: "Structure",
-    title: "转成可复用记忆",
-    body: "用标签、类型、日期和关联产品，把碎片整理成长期记忆，而不是一次性博客。",
+    label: "整理",
+    title: "以后能再找到",
+    body: "用日期、标签和项目把碎片串起来，至少以后我自己能找回当时怎么想的。",
     icon: DatabaseZap,
   },
   {
-    label: "Build",
-    title: "工具辅助产品推进",
-    body: "API Lab、Mermaid、文件管理和后续模型工具，直接服务正在做的产品。",
+    label: "推进",
+    title: "需要的时候打开工具",
+    body: "API Lab、Mermaid、文件管理这些入口，先服务我正在做的几个产品。",
     icon: Wrench,
   },
   {
-    label: "Publish",
-    title: "公开成产品产物",
-    body: "隐私政策、支持页、产品介绍、发布说明和 X 内容都从这里生成和沉淀。",
+    label: "公开",
+    title: "能公开的就整理出来",
+    body: "隐私政策、支持页、产品介绍、X 内容，都是做产品过程中顺手沉淀出来的。",
     icon: FileText,
   },
   {
-    label: "Evolve",
-    title: "喂给自进化 Agent",
-    body: "每次推进都反过来增强 evomap-farmer 和个人 Agent 的上下文。",
+    label: "复用",
+    title: "再回到 Agent 里",
+    body: "我希望每次推进，最后都能反过来增强 evomap-farmer 和自己的 Agent 上下文。",
     icon: GitBranch,
   },
 ];
 
 const capabilityNodes = [
   {
-    title: "Model Lab",
+    title: "模型试验",
     body: "统一测试文本、图片、语音、文件接口。",
     href: "/tools/api-lab",
     icon: Braces,
   },
   {
-    title: "Memory Line",
+    title: "记录时间线",
     body: "公开每日总结和旧内容补录。",
     href: "/notes",
     icon: NotebookPen,
   },
   {
-    title: "Release Kit",
+    title: "上架材料",
     body: "Apple 审核需要的 URL 与说明。",
     href: "/legal/app-store-checklist",
     icon: CheckCircle2,
   },
   {
-    title: "Product Shelf",
-    body: "每个产品的状态、链接和材料。",
+    title: "产品草稿",
+    body: "我给每个项目留下的状态和入口。",
     href: "/products",
     icon: Layers3,
   },
@@ -237,28 +238,21 @@ const fallbackMemories: MemoryItem[] = [
   },
 ];
 
-function noteToMemory(note: DailyNote): MemoryItem {
+function postToMemory(post: PostMeta): MemoryItem {
   return {
-    title: note.title,
-    date: note.noteDate,
+    title: post.title,
+    date: post.date,
     summary:
-      note.summary ||
-      note.contentMarkdown?.split("\n").find(Boolean) ||
-      "这条记录还没有摘要，但已经进入公开时间线。",
-    tags: note.tags.slice(0, 4),
-    href: `/notes#note-${note.id}`,
+      post.excerpt ||
+      "这篇内容还没有摘要,但已经按时间放进公开记录。",
+    tags: post.tags.slice(0, 4),
+    href: `/notes/${post.slug}`,
   };
 }
 
 async function loadRecentMemories(): Promise<MemoryItem[]> {
-  try {
-    const userId = await getPublicNotesUserId();
-    if (!userId) return fallbackMemories;
-    const notes = await listDailyNotes(userId, { limit: 3 });
-    return notes.length > 0 ? notes.map(noteToMemory) : fallbackMemories;
-  } catch {
-    return fallbackMemories;
-  }
+  const posts = getAllPosts().slice(0, 3);
+  return posts.length > 0 ? posts.map(postToMemory) : fallbackMemories;
 }
 
 function ProductStreamCard({ stream }: { stream: ProductStream }) {
@@ -293,7 +287,7 @@ function ProductStreamCard({ stream }: { stream: ProductStream }) {
         <div className="mt-5 rounded-[26px] border border-white/70 bg-white/58 p-4 backdrop-blur-xl">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-slate-500">
             <CircleDot size={14} />
-            Mission
+            为什么记在这里
           </div>
           <p className="mt-3 text-base font-bold leading-8 text-slate-800">
             {stream.mission}
@@ -303,7 +297,7 @@ function ProductStreamCard({ stream }: { stream: ProductStream }) {
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div className="rounded-[24px] border border-white/62 bg-white/42 p-4 backdrop-blur">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-              Now
+              现在做到哪
             </div>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
               {stream.now.map((item) => (
@@ -316,7 +310,7 @@ function ProductStreamCard({ stream }: { stream: ProductStream }) {
           </div>
           <div className="rounded-[24px] border border-white/62 bg-white/42 p-4 backdrop-blur">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-              Next
+              接下来先做什么
             </div>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
               {stream.next.map((item) => (
@@ -363,7 +357,7 @@ function MemoryCard({ memory }: { memory: MemoryItem }) {
           {memory.date}
         </time>
         <span className="rounded-full border border-slate-900/10 bg-slate-50 px-2.5 py-1 text-[11px] font-black text-slate-500">
-          Memory
+          记录
         </span>
       </div>
       <h3 className="mt-4 text-xl font-black tracking-[-0.03em] text-slate-950">
@@ -397,29 +391,31 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute left-1/2 top-10 h-72 w-[48rem] -translate-x-1/2 rounded-full bg-white/50 blur-3xl" />
 
         <div className="relative mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1.08fr)_420px] lg:items-stretch">
-          <div className="aios-hero aios-reveal relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10">
+          <div
+            className="aios-hero aios-reveal relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10"
+            data-watermark="OWEN"
+          >
             <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-cyan-300/18 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-36 left-10 h-80 w-80 rounded-full bg-amber-300/14 blur-3xl" />
             <div className="relative">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-sm font-black text-slate-200 backdrop-blur">
                 <Orbit size={16} />
-                Owen&apos;s AI Product OS
+                欧文的公开工作笔记
               </div>
 
-              <h1 className="aios-dark-title mt-8 max-w-5xl text-5xl font-black leading-[0.92] md:text-7xl lg:text-8xl">
-                不是展示一个网站，而是展示一个正在进化的 AI 产品系统。
+              <h1 className="aios-dark-title mt-7 max-w-5xl text-4xl font-black leading-[0.96] md:text-6xl lg:text-7xl">
+                我把最近做的 AI 产品和每天的想法，先都放在这里。
               </h1>
 
               <p className="mt-7 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">
-                这里把日语学习、亲人沟通、AI Vlog 和自进化 Agent
-                放在同一条工作流里：想法被记录，工具被使用，产品持续推进，经验再回到个人
-                Agent 的长期记忆。
+                它更像一个公开的工作笔记：我在日本学习、做产品、试模型、准备 App
+                上架，也把一些还不成熟的判断和过程先记下来。
               </p>
 
               <div className="mt-8 rounded-[30px] border border-white/10 bg-white/[0.07] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl md:p-5">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.22em] text-slate-400">
                   <Sparkles size={15} />
-                  Intent Console
+                  随手看看
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {intentChips.map((chip) => (
@@ -439,14 +435,14 @@ export default async function HomePage() {
                   href="#product-streams"
                   className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-[0_16px_38px_rgba(255,255,255,0.14)] transition hover:-translate-y-0.5 hover:bg-slate-100"
                 >
-                  进入产品流
+                  看看最近在做什么
                   <ArrowRight size={16} />
                 </Link>
                 <Link
                   href="/notes"
                   className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.08] px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-white/[0.14]"
                 >
-                  查看公开记忆
+                  翻最近记录
                 </Link>
               </div>
             </div>
@@ -459,20 +455,20 @@ export default async function HomePage() {
                   <Sparkles size={22} />
                 </div>
                 <span className="rounded-full border border-slate-900/10 bg-slate-50 px-3 py-1 text-xs font-black text-slate-500">
-                  Live Briefing
+                  今日记录
                 </span>
               </div>
               <h2 className="mt-5 text-3xl font-black tracking-[-0.045em] text-slate-950">
-                今日系统简报
+                今天先记到这里
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                这个区域不只是欢迎语，而是把公开记录和产品状态整理成当前上下文。
+                我会把当天比较重要的进展放到这里，方便自己下次打开时先接上上下文。
               </p>
 
               <div className="mt-5 rounded-[28px] border border-slate-900/10 bg-slate-950 p-4 text-white">
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-mono text-xs text-slate-400">
-                    latest.memory
+                    latest.note
                   </span>
                   <time
                     className="font-mono text-xs text-cyan-200"
@@ -531,10 +527,10 @@ export default async function HomePage() {
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="text-sm font-black uppercase tracking-[0.22em] text-slate-500">
-                Product Streams
+                最近
               </div>
               <h2 className="mt-3 max-w-3xl text-4xl font-black tracking-[-0.055em] text-slate-950 md:text-6xl">
-                4 条产品线，按“任务流”而不是“介绍卡”呈现。
+                最近反复在想的几件事。
               </h2>
             </div>
             <Link
@@ -560,14 +556,14 @@ export default async function HomePage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-sm font-black text-slate-200">
                 <Boxes size={16} />
-                Operating Loop
+                我的整理方式
               </div>
               <h2 className="mt-6 text-4xl font-black leading-tight tracking-[-0.055em] md:text-5xl">
-                AI 驱动不是口号，是内容如何被系统复用。
+                我希望这个站点能帮我少忘一点东西。
               </h2>
               <p className="mt-5 text-base leading-8 text-slate-300">
-                网站不只负责展示最终结果。它负责把日常输入、工具实验、产品发布和个人
-                Agent 的进化连起来，让每次推进都留下可被下一次调用的结构。
+                这里不只放最终结果。更重要的是把日常输入、工具实验、产品发布和个人
+                Agent 的上下文连起来，让每次推进都不要从零开始。
               </p>
             </div>
 
@@ -613,10 +609,10 @@ export default async function HomePage() {
           <div className="rounded-[40px] border border-slate-900/10 bg-white/[0.76] p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-2xl md:p-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-slate-50 px-4 py-2 text-sm font-black text-slate-500">
               <NotebookPen size={16} />
-              Live Memory
+              Notes
             </div>
             <h2 className="mt-6 text-4xl font-black tracking-[-0.055em] text-slate-950 md:text-5xl">
-              记录不是博客，是产品系统的长期记忆。
+              记录先写下来，后面再慢慢整理。
             </h2>
             <p className="mt-5 text-base leading-8 text-slate-600">
               每日总结、旧 QQ
@@ -656,7 +652,7 @@ export default async function HomePage() {
               href="/notes"
               className="inline-flex items-center justify-center gap-2 rounded-[24px] border border-slate-900/10 bg-slate-950 px-5 py-4 text-sm font-black text-white shadow-[0_16px_45px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 hover:bg-slate-800"
             >
-              打开完整记忆流
+              打开完整记录
               <ArrowRight size={16} />
             </Link>
           </div>

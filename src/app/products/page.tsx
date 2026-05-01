@@ -43,23 +43,23 @@ type ProductPassport = {
 const productPassports: ProductPassport[] = [
   {
     id: "japanese-learning-app",
-    label: "Passport 01",
+    label: "草稿 01",
     title: "日语学习工具体系",
     status: "App Store 准备中",
     mission:
-      "用 AI 把日语学习里的输入、理解、练习和输出连成闭环，让学习者不只是查词，而是真的能开口、理解和复用。",
-    role: "主线产品。它会持续验证语音、翻译、笔记、词典和学习历史如何组合成一个真正可用的学习系统。",
+      "这是我最近最想先做好的方向。因为自己在日本学习，能很直接地感受到：查词、翻译、开口练习、笔记复用，应该连在一起。",
+    role: "所以它不只是一个 App，而是一组会慢慢长出来的学习工具。先从语音和同传开始，再往笔记和词典延伸。",
     icon: Mic2,
     tone: "from-cyan-100 via-sky-50 to-white",
     current: [
-      "日语对话练习 App 正在备案并准备上架 App Store。",
-      "学习助手方向承接单词、语法、翻译和笔记体系。",
-      "Web 词典继续推进图文结合的解释方式。",
+      "日语对话练习 App 已经开始备案，准备往 App Store 上架走。",
+      "学习助手这边先接单词、语法、翻译和笔记。",
+      "Web 词典继续推进，希望把日语知识讲得更清楚一点。",
     ],
     next: [
-      "准备 6.5 英寸预览图、隐私政策、支持页和审核备注。",
-      "把第一批真实学习场景整理成可演示内容。",
-      "把语音模型、图片模型和文本接口统一放进 API Lab 里验证。",
+      "先把 6.5 英寸预览图、隐私政策、支持页和审核备注准备好。",
+      "再整理一批自己真的会用的学习场景。",
+      "语音、图片、文本模型都先放到 API Lab 里试，不急着写死。",
     ],
     artifacts: [
       { label: "隐私政策", href: "/legal/apple-privacy" },
@@ -71,23 +71,23 @@ const productPassports: ProductPassport[] = [
   },
   {
     id: "family-ai",
-    label: "Passport 02",
+    label: "草稿 02",
     title: "亲人关系的 AI 社交",
     status: "概念验证",
     mission:
-      "不做泛社交，只做亲人之间的表达和回应。AI 的作用不是替代关系，而是让想说的话更容易被说出来。",
-    role: "关系产品。它关注亲人之间真实存在的表达压力、回应成本和长期连接。",
+      "这个想法还早，但我一直放不下。亲人之间很多问题不是没有感情，而是不知道怎么表达，或者太累了没有回应。",
+    role: "如果以后做，它一定不是泛社交产品，而是围绕亲人之间很具体、很小心的沟通场景。",
     icon: HeartHandshake,
     tone: "from-rose-100 via-orange-50 to-white",
     current: [
-      "定义核心人群：想表达但表达不好的人，以及被需要但没有精力回应的人。",
-      "先从沟通场景和隐私边界开始，而不是急着做泛社交功能。",
-      "把可公开的产品判断沉淀到记录页。",
+      "我先把人群想清楚：想表达但表达不好的人，以及被需要但没有精力回应的人。",
+      "这个方向不能急着做功能，先从场景和隐私边界开始。",
+      "有些判断可以先写在记录里，慢慢看它是不是成立。",
     ],
     next: [
-      "整理 10 个真实沟通场景。",
-      "设计本地优先、少采集数据的产品边界。",
-      "明确哪些内容可以由 AI 生成，哪些必须保留人的确认。",
+      "先记 10 个真实沟通场景。",
+      "再想清楚哪些数据必须本地优先，哪些根本不该采集。",
+      "还要明确：哪些话可以由 AI 辅助，哪些必须由人自己确认。",
     ],
     artifacts: [
       { label: "产品目录", href: "/products" },
@@ -98,23 +98,23 @@ const productPassports: ProductPassport[] = [
   },
   {
     id: "ai-vlog-desk",
-    label: "Passport 03",
+    label: "草稿 03",
     title: "AI Vlog 工作台",
     status: "工作流设计中",
     mission:
-      "用户只负责记录生活素材，AI 负责整理、规划结构和剪辑成片，把低摩擦记录变成可分享作品。",
-    role: "创作产品。它把素材管理、结构规划、模型生成和成片输出拆成可复用流水线。",
+      "我自己经常记录很多素材，但整理成本太高。这个方向想做的是：先把生活记录下来，后面让 AI 帮忙整理成作品。",
+    role: "它更像一个工作台，不是一个复杂剪辑软件。关键是降低从“记录”到“成片”的距离。",
     icon: Video,
     tone: "from-amber-100 via-stone-50 to-white",
     current: [
-      "先定义图、音、文三类素材如何进入系统。",
-      "把自动整理、分镜规划、字幕和剪辑拆成工作流节点。",
-      "供应商能力会先在 API Lab 里做实验。",
+      "先想清楚图片、音频、文字怎么进来。",
+      "再把整理、分镜、字幕、剪辑拆成几个小步骤。",
+      "模型供应商先都在 API Lab 里试。",
     ],
     next: [
-      "设计素材入库格式和生成任务结构。",
-      "用 Mermaid 画出第一版自动成片流程。",
-      "整理可测试的视频模型、语音模型和字幕工具。",
+      "先设计素材入库格式和生成任务结构。",
+      "用 Mermaid 画出第一版流程。",
+      "再整理几个能测试的视频、语音和字幕工具。",
     ],
     artifacts: [
       { label: "API Lab", href: "/tools/api-lab" },
@@ -125,23 +125,23 @@ const productPassports: ProductPassport[] = [
   },
   {
     id: "self-evolving-agent",
-    label: "Passport 04",
+    label: "草稿 04",
     title: "自进化个人 Agent",
     status: "长期主线",
     mission:
-      "围绕主流 Agent 做长期记忆和能力进化系统，让每次开发、运营和产品判断都能成为下一次的上下文。",
-    role: "底层系统。它不是单个功能，而是未来持续做新项目的生产力基础设施。",
+      "这是更长期的底层方向。我想让每一次开发、运营和产品判断，都不要只停留在这一次。",
+    role: "如果它能做好，以后我做新项目时就不需要一遍遍从零解释背景。",
     icon: Bot,
     tone: "from-lime-100 via-emerald-50 to-white",
     current: [
-      "evomap-farmer 是当前重点推进的项目。",
-      "AiTool 2.0 正在变成公开工具、记录和产品材料入口。",
-      "每天的总结和旧内容补录会逐步形成长期记忆。",
+      "evomap-farmer 是当前重点。",
+      "AiTool 2.0 先承担公开工具、记录和产品材料入口。",
+      "每天的总结和以后补录的旧内容，会慢慢变成长期记忆。",
     ],
     next: [
-      "让记录页按产品、标签、日期持续聚合上下文。",
-      "把工具使用经验、供应商体验和开发过程结构化。",
-      "让 Codex 生成内容后可以自动写入公开记录。",
+      "让记录页先按产品、标签和日期聚合上下文。",
+      "把工具使用经验、供应商体验和开发过程慢慢结构化。",
+      "以后希望 Codex 生成完内容，可以直接写进公开记录。",
     ],
     artifacts: [
       { label: "记忆流", href: "/notes" },
@@ -153,10 +153,10 @@ const productPassports: ProductPassport[] = [
 ];
 
 const releaseSteps = [
-  "确认 App 名称、分类、年龄分级和审核备注。",
-  "准备隐私政策 URL、支持 URL、使用条款和数据删除说明。",
-  "准备 6.5 英寸截图、功能说明、测试账号和演示路径。",
-  "把每次提交、拒审和修改记录回到 notes，作为下一次上架经验。",
+  "App 名称、分类、年龄分级、审核备注不要临时再想。",
+  "隐私政策、支持页、条款、数据删除说明先放在固定位置。",
+  "截图、功能说明、测试账号、演示路径每次都要检查。",
+  "每次提交、拒审和修改都记回 notes，下次不要再踩同一个坑。",
 ];
 
 function PassportCard({ product }: { product: ProductPassport }) {
@@ -192,7 +192,7 @@ function PassportCard({ product }: { product: ProductPassport }) {
           <div className="rounded-[28px] border border-white/70 bg-white/58 p-5 backdrop-blur-xl">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-slate-500">
               <Sparkles size={14} />
-              Mission
+              为什么想做
             </div>
             <p className="mt-3 text-base font-bold leading-8 text-slate-800">
               {product.mission}
@@ -204,7 +204,7 @@ function PassportCard({ product }: { product: ProductPassport }) {
 
           <div className="rounded-[28px] border border-white/70 bg-white/42 p-5 backdrop-blur-xl">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-              Stack Signals
+              可能会用到
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {product.stack.map((item) => (
@@ -222,7 +222,7 @@ function PassportCard({ product }: { product: ProductPassport }) {
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div className="rounded-[26px] border border-white/70 bg-white/46 p-4 backdrop-blur">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-              Current State
+              现在做到哪
             </div>
             <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-600">
               {product.current.map((item) => (
@@ -238,7 +238,7 @@ function PassportCard({ product }: { product: ProductPassport }) {
           </div>
           <div className="rounded-[26px] border border-white/70 bg-white/46 p-4 backdrop-blur">
             <div className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-              Next Move
+              下一步先做什么
             </div>
             <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-600">
               {product.next.map((item) => (
@@ -275,19 +275,21 @@ export default function ProductsPage() {
   return (
     <main className="aios-page min-h-screen px-4 py-10 text-slate-950 md:px-8 md:py-14">
       <section className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="aios-hero relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10">
+        <div
+          className="aios-hero relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10"
+          data-watermark="DRAFT"
+        >
           <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-cyan-300/18 blur-3xl" />
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-sm font-black text-slate-200">
               <PackageOpen size={16} />
-              Product Passport
+              产品草稿
             </div>
-            <h1 className="aios-dark-title mt-7 max-w-4xl text-5xl font-black leading-[0.94] md:text-7xl">
-              每个产品都应该有任务、状态、证据和下一步。
+            <h1 className="aios-dark-title mt-7 max-w-4xl text-4xl font-black leading-[0.98] md:text-6xl">
+              这里先放我的产品草稿，不写成发布会稿子。
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">
-              这个页面不只是产品列表，而是 AiTool 2.0
-              的产品护照：记录它们为什么存在、现在推进到哪里、接下来要做什么，以及对外发布时需要哪些公开材料。
+              我先把每个方向为什么想做、现在推进到哪、接下来要补什么写清楚。等以后真的发布，再从这些草稿里整理成正式介绍。
             </p>
           </div>
         </div>
@@ -298,11 +300,11 @@ export default function ProductsPage() {
               <Rocket size={22} />
             </div>
             <span className="rounded-full border border-slate-900/10 bg-slate-50 px-3 py-1 text-xs font-black text-slate-500">
-              Release Cockpit
+              上架备忘
             </span>
           </div>
           <h2 className="mt-5 text-3xl font-black tracking-[-0.045em] text-slate-950">
-            发布不是最后一步，而是产品系统的一部分。
+            最近要上架 App，所以这些材料先集中放着。
           </h2>
           <div className="mt-5 space-y-3">
             {releaseSteps.map((step, index) => (
@@ -340,7 +342,7 @@ export default function ProductsPage() {
               App Store Connect
             </div>
             <h2 className="mt-4 text-4xl font-black tracking-[-0.055em] text-slate-950 md:text-5xl">
-              可以直接给 Apple 使用的公开 URL。
+              这些链接之后会直接填到 App Store Connect。
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">
               这些页面会作为上架材料、审核备注和用户支持入口。正式提交前，只需要确认域名可访问、邮箱可收信、内容和
@@ -395,7 +397,7 @@ export default function ProductsPage() {
           <div>
             <BookOpenText size={28} className="text-cyan-200" />
             <h2 className="mt-4 text-3xl font-black tracking-[-0.04em]">
-              旧产品信息仍然保留，但不再作为主叙事。
+              以前的一些入口先留着，但主线会慢慢收敛。
             </h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

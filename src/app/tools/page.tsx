@@ -36,33 +36,33 @@ type CapabilityNode = {
   tone: string;
 };
 
-const capabilityNodes: CapabilityNode[] = [
+const capabilityEntries: CapabilityNode[] = [
   {
-    layer: "Model Interface",
+    layer: "我试模型的地方",
     title: "API Lab",
     description:
-      "把文本、图片、语音、文件和实时接口放进同一个模型实验室，先验证供应商能力，再沉淀成产品工作流。",
+      "我平时会反复试不同供应商的模型，先集中放在这里，不要每次都重新拼请求。",
     href: "/tools/api-lab",
     icon: Network,
-    status: "核心实验层",
-    inputs: ["供应商", "模型", "请求体", "文件"],
-    outputs: ["响应结果", "cURL", "经验记录"],
+    status: "常用",
+    inputs: ["供应商", "模型", "请求内容", "文件"],
+    outputs: ["返回结果", "cURL", "踩坑记录"],
     tone: "from-slate-100 via-cyan-50 to-white",
   },
   {
-    layer: "Visual Thinking",
+    layer: "我画流程的地方",
     title: "Mermaid 在线查看",
     description:
-      "快速把产品流程、Agent 流程、App Store 准备路径和系统架构画出来，帮助想法从文字变成结构。",
+      "很多想法只写文字会绕，先用 Mermaid 画一下，自己也更容易看清楚。",
     href: "/tools/mermaid",
     icon: Code2,
-    status: "结构化工具",
+    status: "顺手工具",
     inputs: ["流程", "架构", "路线图"],
     outputs: ["SVG 预览", "Mermaid 代码", "说明图"],
     tone: "from-sky-100 via-blue-50 to-white",
   },
   {
-    layer: "File Memory",
+    layer: "旧文件能力",
     title: "StepFun 文件管理",
     description:
       "保留旧服务里真正有用的文件能力，用来查询、清理和管理历史文件资产。",
@@ -74,37 +74,37 @@ const capabilityNodes: CapabilityNode[] = [
     tone: "from-amber-100 via-stone-50 to-white",
   },
   {
-    layer: "Public Memory",
-    title: "每日记录 API",
+    layer: "公开记录",
+    title: "记录时间线",
     description:
-      "Codex 生成的每日总结、旧内容补录、产品判断和素材摘录，可以进入公开时间线。",
+      "本地 Markdown 仓库 (AiTool-content) push 即发布,顶部 5 个快捷视图按 tag 过滤。",
     href: "/notes",
     icon: NotebookPen,
-    status: "长期记忆层",
-    inputs: ["日期", "标签", "Markdown", "媒体块"],
-    outputs: ["公开记录", "标签索引", "Agent 上下文"],
+    status: "记录入口",
+    inputs: ["frontmatter", "标签", "Markdown", "iframe 媒体"],
+    outputs: ["公开记录", "标签云", "详情页"],
     tone: "from-lime-100 via-emerald-50 to-white",
   },
   {
-    layer: "Release System",
+    layer: "我准备上架材料的地方",
     title: "App Store 材料",
     description:
-      "把隐私政策、支持页、条款、数据删除说明和上架清单变成可复用的发布工具包。",
+      "最近要上架 App，这些页面就先固定下来，之后每个产品都可以复用。",
     href: "/legal/app-store-checklist",
     icon: ShieldCheck,
-    status: "发布支撑层",
+    status: "上架相关",
     inputs: ["App 行为", "隐私标签", "截图", "审核说明"],
     outputs: ["公开 URL", "检查清单", "审核材料"],
     tone: "from-rose-100 via-orange-50 to-white",
   },
   {
-    layer: "Product Context",
+    layer: "我放产品笔记的地方",
     title: "产品护照",
     description:
-      "每个产品都记录 Mission、Current State、Next Move 和 Artifacts，避免方向散掉。",
+      "每个项目先留一页，写清楚我为什么做、现在做到哪、下一步是什么。",
     href: "/products",
     icon: PackageOpen,
-    status: "产品上下文",
+    status: "产品笔记",
     inputs: ["产品想法", "进度", "发布材料"],
     outputs: ["产品状态", "对外说明", "下一步"],
     tone: "from-violet-100 via-slate-50 to-white",
@@ -115,41 +115,41 @@ const workflowRecipes = [
   {
     title: "准备一个 App 上架",
     steps: [
-      "产品护照确认功能边界",
-      "上架清单检查材料",
-      "API Lab 验证模型能力",
-      "记录页沉淀踩坑",
+      "先确认这个 App 到底解决什么",
+      "再检查上架材料有没有漏",
+      "需要模型能力的地方先去 API Lab 试",
+      "过程和踩坑写回记录",
     ],
     icon: CheckCircle2,
   },
   {
     title: "验证一个模型供应商",
     steps: [
-      "API Lab 配置请求",
-      "保存输入输出样例",
-      "记录价格和错误",
-      "决定是否进入产品流",
+      "在 API Lab 配请求",
+      "保存几个真实输入输出",
+      "记一下价格、错误和限制",
+      "决定要不要继续做",
     ],
     icon: Braces,
   },
   {
     title: "把想法变成系统能力",
     steps: [
-      "notes 记录原始想法",
-      "Mermaid 画流程",
-      "产品页绑定方向",
-      "Agent 长期复用",
+      "先在 notes 写原始想法",
+      "再用 Mermaid 画流程",
+      "放回对应产品页",
+      "以后给 Agent 复用",
     ],
     icon: GitBranch,
   },
 ];
 
 const operatingLayers = [
-  { label: "Capture", body: "记录素材和想法", icon: PenTool },
-  { label: "Experiment", body: "验证模型与接口", icon: Braces },
-  { label: "Structure", body: "流程化和标签化", icon: DatabaseZap },
-  { label: "Ship", body: "形成公开产品材料", icon: Layers3 },
-  { label: "Evolve", body: "回流到个人 Agent", icon: BrainCircuit },
+  { label: "先记下", body: "素材和想法别丢", icon: PenTool },
+  { label: "试一下", body: "模型和接口先跑通", icon: Braces },
+  { label: "整理一下", body: "加标签、画流程", icon: DatabaseZap },
+  { label: "能发布", body: "变成对外材料", icon: Layers3 },
+  { label: "再复用", body: "回到 Agent 记忆里", icon: BrainCircuit },
 ];
 
 function CapabilityCard({ node }: { node: CapabilityNode }) {
@@ -183,7 +183,7 @@ function CapabilityCard({ node }: { node: CapabilityNode }) {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-[22px] border border-white/70 bg-white/48 p-3 backdrop-blur">
             <div className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-              Input
+              我放进去
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {node.inputs.map((item) => (
@@ -198,7 +198,7 @@ function CapabilityCard({ node }: { node: CapabilityNode }) {
           </div>
           <div className="rounded-[22px] border border-white/70 bg-white/48 p-3 backdrop-blur">
             <div className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-              Output
+              我拿出来
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {node.outputs.map((item) => (
@@ -214,7 +214,7 @@ function CapabilityCard({ node }: { node: CapabilityNode }) {
         </div>
 
         <div className="mt-5 inline-flex items-center gap-2 text-sm font-black text-slate-700">
-          打开能力节点
+          打开这个入口
           <ArrowRight size={15} />
         </div>
       </div>
@@ -226,20 +226,22 @@ export default function ToolsPage() {
   return (
     <main className="aios-page min-h-screen px-4 py-10 text-slate-950 md:px-8 md:py-14">
       <section className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.06fr_0.94fr]">
-        <div className="aios-hero relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10">
+        <div
+          className="aios-hero relative overflow-hidden rounded-[46px] border border-white/10 p-6 text-white md:p-10"
+          data-watermark="TOOLS"
+        >
           <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-cyan-300/18 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 left-10 h-72 w-72 rounded-full bg-amber-300/14 blur-3xl" />
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-sm font-black text-slate-200">
               <Orbit size={16} />
-              Capability Map
+              工具入口
             </div>
-            <h1 className="aios-dark-title mt-7 max-w-4xl text-5xl font-black leading-[0.94] md:text-7xl">
-              工具不是导航，是 AI 产品系统的能力节点。
+            <h1 className="aios-dark-title mt-7 max-w-4xl text-4xl font-black leading-[0.98] md:text-6xl">
+              这些不是展示用的工具，是我自己会反复打开的入口。
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">
-              这里不再把工具当作散落入口，而是按“输入什么、产出什么、服务哪条产品线”来组织。每个工具都应该回到产品推进、内容记录和
-              Agent 进化里。
+              这里不再把工具当作散落链接，而是按“我放进去什么、能拿出来什么、最后服务哪件事”来整理。用过的经验以后也能回到长期记录里。
             </p>
           </div>
         </div>
@@ -250,11 +252,11 @@ export default function ToolsPage() {
               <Boxes size={22} />
             </div>
             <span className="rounded-full border border-slate-900/10 bg-slate-50 px-3 py-1 text-xs font-black text-slate-500">
-              Operating Layers
+              我的使用顺序
             </span>
           </div>
           <h2 className="mt-5 text-3xl font-black tracking-[-0.045em] text-slate-950">
-            从想法到产品，工具应该接在同一条链路上。
+            我希望这些入口能接成一条顺手的链路。
           </h2>
           <div className="mt-5 space-y-3">
             {operatingLayers.map((layer, index) => {
@@ -295,22 +297,22 @@ export default function ToolsPage() {
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-sm font-black uppercase tracking-[0.22em] text-slate-500">
-              Nodes
+              入口
             </div>
             <h2 className="mt-3 text-4xl font-black tracking-[-0.055em] text-slate-950 md:text-5xl">
-              当前能力地图
+              现在先放这些入口
             </h2>
           </div>
           <Link
             href="/products"
             className="inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/75 px-4 py-2 text-sm font-black text-slate-600 transition hover:bg-white hover:text-slate-950"
           >
-            看产品如何使用这些能力
+            看它们对应哪些项目
             <ArrowRight size={15} />
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {capabilityNodes.map((node) => (
+          {capabilityEntries.map((node) => (
             <CapabilityCard key={node.title} node={node} />
           ))}
         </div>
@@ -320,7 +322,7 @@ export default function ToolsPage() {
         <div className="rounded-[40px] border border-slate-900/10 bg-slate-950 p-6 text-white shadow-[0_24px_90px_rgba(15,23,42,0.2)] md:p-8">
           <Sparkles size={28} className="text-cyan-200" />
           <h2 className="mt-5 text-3xl font-black tracking-[-0.04em] md:text-4xl">
-            真实工作流比工具数量更重要。
+            工具多少不重要，关键是我真的会用。
           </h2>
           <p className="mt-4 text-sm leading-8 text-slate-300 md:text-base">
             AiTool 2.0
@@ -365,10 +367,10 @@ export default function ToolsPage() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-slate-50 px-4 py-2 text-sm font-black text-slate-500">
               <Wrench size={16} />
-              Direct Tools
+              直接打开
             </div>
             <h2 className="mt-4 text-4xl font-black tracking-[-0.055em] text-slate-950 md:text-5xl">
-              仍然可以直接打开工具。
+              如果已经知道要用哪个，也可以直接点。
             </h2>
           </div>
         </div>

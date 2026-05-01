@@ -168,7 +168,7 @@ body {
   }
 
   .aios-hero::after {
-    content: "AIOS";
+    content: attr(data-watermark);
     position: absolute;
     right: -0.08em;
     bottom: -0.32em;

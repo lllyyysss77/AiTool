@@ -1,10 +1,10 @@
 const tickerItems = [
-  "AI Product OS",
-  "Memory Timeline",
-  "Capability Map",
-  "Release Kit",
-  "Agent Context",
-  "Build In Public",
+  "正在做的产品",
+  "今天记了什么",
+  "日语学习工具",
+  "模型试用记录",
+  "App 上架材料",
+  "自进化 Agent",
 ];
 
 export default function AiosTicker() {
