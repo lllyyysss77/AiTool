@@ -11,7 +11,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' \
     /etc/apk/repositories
 
 # ② 安装系统依赖
-RUN apk add --no-cache python3 make g++ git bash openssl libpq postgresql-libs
+RUN apk add --no-cache python3 make g++ git bash openssl
 
 # ③ 仅复制依赖声明，做缓存层
 COPY package*.json ./

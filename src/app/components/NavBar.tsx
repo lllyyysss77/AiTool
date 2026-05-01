@@ -6,8 +6,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown, Github, Sparkles } from "lucide-react";
 import { useUser } from "@/app/providers/UserProvider";
 import UserInfoModal from "./info/UserInfoModal";
-import SupplierModelManagement from "./info/SupplierModelManagement";
-import AgentManagement from "./info/agentConfig/AgentManagement";
 import { menuData, MenuItem } from "./menuData";
 import { buildLoginModalPath } from "@/lib/auth/loginModal";
 
@@ -111,8 +109,6 @@ export default function NavBar() {
   const searchParams = useSearchParams();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
-  const [showSupplierModal, setShowSupplierModal] = useState(false);
-  const [showAgentModal, setShowAgentModal] = useState(false);
   const hoverTimer = useRef<number>();
 
   if (
@@ -212,7 +208,7 @@ export default function NavBar() {
 
                 {
                   <div
-                    className={`absolute right-0 top-full mt-3 w-60 rounded-[28px] border border-white/75 bg-white/[0.9] p-2 shadow-[0_22px_70px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 backdrop-blur-2xl transition-all duration-200 origin-top-right supports-[backdrop-filter]:bg-white/[0.76] ${dropdownOpen ? "scale-100 opacity-100 pointer-events-auto" : "scale-95 opacity-0 pointer-events-none"}`}
+                    className={`absolute right-0 top-full mt-3 w-52 rounded-[28px] border border-white/75 bg-white/[0.9] p-2 shadow-[0_22px_70px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 backdrop-blur-2xl transition-all duration-200 origin-top-right supports-[backdrop-filter]:bg-white/[0.76] ${dropdownOpen ? "scale-100 opacity-100 pointer-events-auto" : "scale-95 opacity-0 pointer-events-none"}`}
                   >
                     <button
                       type="button"
@@ -223,26 +219,6 @@ export default function NavBar() {
                       }}
                     >
                       个人信息
-                    </button>
-                    <button
-                      type="button"
-                      className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-white hover:text-slate-900"
-                      onClick={() => {
-                        setShowSupplierModal(true);
-                        setDropdownOpen(false);
-                      }}
-                    >
-                      供应商＆模型管理
-                    </button>
-                    <button
-                      type="button"
-                      className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-white hover:text-slate-900"
-                      onClick={() => {
-                        setShowAgentModal(true);
-                        setDropdownOpen(false);
-                      }}
-                    >
-                      Agent 管理
                     </button>
                     <button
                       type="button"
@@ -269,12 +245,6 @@ export default function NavBar() {
 
       {showUserModal && user ? (
         <UserInfoModal data={user} onClose={() => setShowUserModal(false)} />
-      ) : null}
-      {showSupplierModal ? (
-        <SupplierModelManagement onClose={() => setShowSupplierModal(false)} />
-      ) : null}
-      {showAgentModal ? (
-        <AgentManagement onClose={() => setShowAgentModal(false)} />
       ) : null}
     </>
   );

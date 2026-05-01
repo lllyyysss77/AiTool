@@ -1,19 +1,16 @@
 // File: src/app/api/completions/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { withUser } from '@/lib/api/auth';
-import { getSupplierById } from '@/lib/repositories/suppliers/supplierRepository';
 import configurations from '@/config';
 
 interface ChatRequest {
-    supplierId?: string;
     model?: string;
     scene?: string;
     messages: { role: string; content: string }[];
     meta?: any;
 }
 
-export const POST = withUser(async (req: NextRequest, userId: string) => {
-    console.log('👉 [completions] resolved userId =', userId);
+export const POST = withUser(async (req: NextRequest) => {
     let body: ChatRequest;
     try {
         body = await req.json();
@@ -21,7 +18,7 @@ export const POST = withUser(async (req: NextRequest, userId: string) => {
         return new NextResponse('Invalid JSON', { status: 400 });
     }
 
-    const { supplierId, model: bodyModel, scene, messages: orig, meta } = body;
+    const { scene, messages: orig, meta } = body;
     if (!orig?.length) {
         return new NextResponse('Missing messages', { status: 400 });
     }
@@ -51,17 +48,7 @@ export const POST = withUser(async (req: NextRequest, userId: string) => {
             messages.unshift({ role: 'system', content: cfg.systemMessage });
         }
     } else {
-        // 供应商代理模式
-        if (!supplierId || !bodyModel) {
-            return new NextResponse('Missing supplierId or model', { status: 400 });
-        }
-        const sup = await getSupplierById(supplierId).catch(() => null);
-        if (!sup || sup.userId !== userId) {
-            return new NextResponse('Forbidden', { status: 403 });
-        }
-        apiUrl = sup.apiUrl;
-        apiKey = sup.apiKey;
-        model  = bodyModel;
+        return new NextResponse('Missing scene; supplier proxy mode has been removed', { status: 400 });
     }
 
     try {

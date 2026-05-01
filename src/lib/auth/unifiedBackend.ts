@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { UNIFIED_BACKEND_CONFIG } from '@/config';
-import { upsertUser } from '@/lib/repositories/userRepository';
 
 export interface UnifiedBackendProfile {
     id: string;
@@ -238,12 +237,5 @@ export function getUnifiedProfileAccountName(profile: UnifiedBackendProfile) {
 }
 
 export async function syncUnifiedProfile(profile: UnifiedBackendProfile) {
-    await upsertUser({
-        id: profile.id,
-        nickname: getUnifiedProfileDisplayName(profile),
-        email: profile.email || '',
-        phone: '',
-        wechat: '',
-        accountLevel: profile.is_anonymous ? 0 : 1,
-    });
+    void profile;
 }

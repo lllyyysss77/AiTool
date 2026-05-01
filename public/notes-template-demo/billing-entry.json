@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-05-01T15:38:58.654047+00:00",
+  "project": "aitool",
+  "provider": "stepfun",
+  "model": "step-tts-2",
+  "feature": "tts",
+  "unit": "character",
+  "quantity": 104.0,
+  "unit_price": 0.00028,
+  "currency": "CNY",
+  "estimated_cost": 0.02912,
+  "pricing_status": "resolved",
+  "billing_scope": "user_api",
+  "output_path": "public/notes-template-demo/template-narration.wav",
+  "notes": "{\"slot\": \"notes-template-demo\", \"mode\": \"speak\", \"output_format\": \"wav\", \"voice\": \"cixingnansheng\", \"style\": \"温柔\"}",
+  "source_ref": "https://platform.stepfun.com/docs/zh/pricing/details"
+}

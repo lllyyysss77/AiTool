@@ -15,4 +15,5 @@ services:
       - ./src:/app/src
       - ./public:/app/public
       - ./ecosystem.config.cjs:/app/ecosystem.config.cjs
+      - ../AiTool-content:/AiTool-content:ro
     restart: unless-stopped

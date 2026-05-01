@@ -392,6 +392,135 @@ body {
   }
 }
 
+@layer components {
+  .notes-prose {
+    font-size: 1.03rem;
+  }
+
+  .notes-prose h2,
+  .notes-prose h3,
+  .notes-prose h4 {
+    scroll-margin-top: 7rem;
+  }
+
+  .notes-prose .notes-heading-anchor {
+    margin-left: 0.5rem;
+    text-decoration: none;
+    opacity: 0;
+    color: #94a3b8;
+    transition:
+      opacity 160ms ease,
+      color 160ms ease;
+  }
+
+  .notes-prose h2:hover .notes-heading-anchor,
+  .notes-prose h3:hover .notes-heading-anchor,
+  .notes-prose h4:hover .notes-heading-anchor {
+    opacity: 1;
+  }
+
+  .notes-prose .notes-heading-anchor:hover {
+    color: #0f172a;
+  }
+
+  .notes-prose figure {
+    margin: 2rem 0;
+  }
+
+  .notes-prose figcaption {
+    margin-top: 0.85rem;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #64748b;
+  }
+
+  .notes-prose .notes-callout {
+    position: relative;
+    margin: 1.75rem 0;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    padding: 1rem 1.15rem 1.05rem;
+    box-shadow:
+      0 18px 45px rgba(15, 23, 42, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.66);
+  }
+
+  .notes-prose .notes-callout::before {
+    content: attr(data-callout-title);
+    display: block;
+    margin-bottom: 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .notes-prose .notes-callout > :first-child {
+    margin-top: 0;
+  }
+
+  .notes-prose .notes-callout > :last-child {
+    margin-bottom: 0;
+  }
+
+  .notes-prose .notes-callout--note {
+    background: linear-gradient(180deg, rgba(241, 245, 249, 0.92), rgba(255, 255, 255, 0.94));
+  }
+
+  .notes-prose .notes-callout--note::before {
+    color: #334155;
+  }
+
+  .notes-prose .notes-callout--tip {
+    border-color: rgba(13, 148, 136, 0.16);
+    background: linear-gradient(180deg, rgba(236, 253, 245, 0.92), rgba(255, 255, 255, 0.94));
+  }
+
+  .notes-prose .notes-callout--tip::before {
+    color: #0f766e;
+  }
+
+  .notes-prose .notes-callout--warn {
+    border-color: rgba(217, 119, 6, 0.18);
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.94), rgba(255, 255, 255, 0.94));
+  }
+
+  .notes-prose .notes-callout--warn::before {
+    color: #b45309;
+  }
+
+  .notes-prose .notes-callout--quote {
+    border-color: rgba(124, 58, 237, 0.14);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.96));
+  }
+
+  .notes-prose .notes-callout--quote::before {
+    color: #6d28d9;
+  }
+
+  .notes-prose .notes-embed-frame {
+    overflow: hidden;
+    border-radius: 1.5rem;
+  }
+
+  .notes-prose ul.contains-task-list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .notes-prose ul.contains-task-list li {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+  }
+
+  .notes-prose ul.contains-task-list li input {
+    margin-top: 0.42rem;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
