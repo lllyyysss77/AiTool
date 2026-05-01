@@ -5,17 +5,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --accent-blue: #2563eb;
-  --accent-soft: #dbeafe;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #eeeae0;
+  --foreground: #202322;
+  --paper: #f7f4ec;
+  --paper-soft: #ebe5d8;
+  --ink: #181b1a;
+  --muted-ink: #5d625a;
+  --moss: #56651f;
+  --moss-dark: #26321d;
+  --signal-cyan: #76d7d0;
+  --signal-amber: #d7a13e;
+  --accent-soft: #dce8be;
+  --hairline: rgba(24, 27, 26, 0.12);
+  color-scheme: light;
 }
 
 html {
@@ -27,12 +29,15 @@ html {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    "Avenir Next", "Hiragino Sans GB", "Hiragino Sans", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  letter-spacing: -0.01em;
 }
 
 ::selection {
   background: var(--accent-soft);
-  color: #1e3a5f;
+  color: var(--ink);
 }
 
 ::-webkit-scrollbar {
@@ -54,6 +59,278 @@ body {
 }
 
 @layer utilities {
+  .font-display {
+    font-family:
+      "Avenir Next", "Hiragino Sans GB", "PingFang SC", "Microsoft YaHei",
+      sans-serif;
+  }
+
+  .font-stamp {
+    font-family: "American Typewriter", "Courier New", "Songti SC", serif;
+    letter-spacing: -0.03em;
+  }
+
+  .font-data {
+    font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace;
+    letter-spacing: -0.02em;
+  }
+
+  .aios-page {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at 9% 4%,
+        rgba(118, 215, 208, 0.24),
+        transparent 27rem
+      ),
+      radial-gradient(
+        circle at 86% 12%,
+        rgba(215, 161, 62, 0.22),
+        transparent 25rem
+      ),
+      linear-gradient(180deg, #f3efe6 0%, #ebe5d8 48%, #f6f1e8 100%);
+  }
+
+  .aios-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 0.42;
+    background-image:
+      linear-gradient(rgba(24, 27, 26, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(24, 27, 26, 0.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.88), transparent 78%);
+  }
+
+  .aios-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.45;
+    background-image:
+      radial-gradient(
+        circle at 20% 20%,
+        rgba(24, 27, 26, 0.11) 0 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 80% 40%,
+        rgba(24, 27, 26, 0.08) 0 1px,
+        transparent 1px
+      );
+    background-size:
+      11px 11px,
+      17px 17px;
+    mix-blend-mode: multiply;
+  }
+
+  .aios-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at 78% 0%,
+        rgba(118, 215, 208, 0.26),
+        transparent 24rem
+      ),
+      radial-gradient(
+        circle at 8% 100%,
+        rgba(215, 161, 62, 0.19),
+        transparent 26rem
+      ),
+      linear-gradient(135deg, #101312 0%, #1e2a20 52%, #111412 100%);
+    box-shadow:
+      0 36px 120px rgba(16, 19, 18, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .aios-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.22;
+    background-image:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+      linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(
+      circle at 72% 18%,
+      rgba(0, 0, 0, 1),
+      transparent 72%
+    );
+  }
+
+  .aios-hero::after {
+    content: "AIOS";
+    position: absolute;
+    right: -0.08em;
+    bottom: -0.32em;
+    color: rgba(255, 255, 255, 0.045);
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: clamp(8rem, 22vw, 22rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.12em;
+    pointer-events: none;
+  }
+
+  .aios-paper {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.76),
+        rgba(249, 246, 237, 0.86)
+      ),
+      var(--paper);
+    border: 1px solid rgba(24, 27, 26, 0.12);
+    box-shadow:
+      0 24px 80px rgba(24, 27, 26, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .aios-paper::before,
+  .aios-paper::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    height: 1px;
+    pointer-events: none;
+    background-image: linear-gradient(
+      90deg,
+      rgba(24, 27, 26, 0.22) 0 8px,
+      transparent 8px 14px
+    );
+    background-size: 14px 1px;
+  }
+
+  .aios-paper::before {
+    top: 18px;
+  }
+  .aios-paper::after {
+    bottom: 18px;
+  }
+
+  .aios-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(24, 27, 26, 0.14);
+    background: rgba(255, 255, 255, 0.54);
+    color: var(--muted-ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(16px);
+  }
+
+  .aios-kicker {
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .aios-title {
+    color: var(--ink);
+    font-family: "Avenir Next", "Hiragino Sans GB", "PingFang SC", sans-serif;
+    letter-spacing: -0.075em;
+  }
+
+  .aios-dark-title {
+    color: #fbfaf6;
+    font-family: "Avenir Next", "Hiragino Sans GB", "PingFang SC", sans-serif;
+    letter-spacing: -0.078em;
+  }
+
+  .aios-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(24, 27, 26, 0.12);
+    box-shadow:
+      0 20px 70px rgba(24, 27, 26, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .aios-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 18px 16px 18px;
+    height: 1px;
+    opacity: 0.42;
+    background-image: linear-gradient(
+      90deg,
+      rgba(24, 27, 26, 0.34) 0 6px,
+      transparent 6px 12px
+    );
+    pointer-events: none;
+  }
+
+  .aios-chip {
+    border: 1px solid rgba(24, 27, 26, 0.12);
+    background: rgba(255, 255, 255, 0.62);
+    color: var(--muted-ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  }
+
+  .aios-barcode {
+    height: 3.25rem;
+    opacity: 0.82;
+    background: linear-gradient(
+      90deg,
+      #1d201e 0 3px,
+      transparent 3px 7px,
+      #1d201e 7px 9px,
+      transparent 9px 15px,
+      #1d201e 15px 20px,
+      transparent 20px 24px,
+      #1d201e 24px 26px,
+      transparent 26px 31px,
+      #1d201e 31px 37px,
+      transparent 37px 44px,
+      #1d201e 44px 47px,
+      transparent 47px 54px,
+      #1d201e 54px 58px,
+      transparent 58px 64px
+    );
+    background-size: 64px 100%;
+  }
+
+  .aios-reveal {
+    animation: fadeInUp 0.68s cubic-bezier(0.19, 1, 0.22, 1) both;
+  }
+
+  .aios-marquee {
+    overflow: hidden;
+    border-block: 1px solid rgba(24, 27, 26, 0.12);
+    background: rgba(255, 255, 255, 0.36);
+  }
+
+  .aios-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: aios-marquee 32s linear infinite;
+  }
+
+  .aios-marquee span {
+    padding: 0.8rem 1.25rem;
+    color: rgba(24, 27, 26, 0.62);
+    font-family: "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out both;
   }
@@ -70,15 +347,30 @@ body {
     animation: scaleIn 0.35s ease-out both;
   }
 
-  .stagger-1 { animation-delay: 0.06s; }
-  .stagger-2 { animation-delay: 0.12s; }
-  .stagger-3 { animation-delay: 0.18s; }
-  .stagger-4 { animation-delay: 0.24s; }
-  .stagger-5 { animation-delay: 0.30s; }
-  .stagger-6 { animation-delay: 0.36s; }
+  .stagger-1 {
+    animation-delay: 0.06s;
+  }
+  .stagger-2 {
+    animation-delay: 0.12s;
+  }
+  .stagger-3 {
+    animation-delay: 0.18s;
+  }
+  .stagger-4 {
+    animation-delay: 0.24s;
+  }
+  .stagger-5 {
+    animation-delay: 0.3s;
+  }
+  .stagger-6 {
+    animation-delay: 0.36s;
+  }
 
   .card-hover {
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
   }
 
   .card-hover:hover {
@@ -87,18 +379,26 @@ body {
   }
 
   .link-card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .link-card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.10);
+    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.1);
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
@@ -135,6 +435,20 @@ body {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes aios-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
