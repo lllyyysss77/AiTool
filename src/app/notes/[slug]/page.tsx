@@ -30,9 +30,10 @@ export default async function PostPage({ params }: Props) {
     const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
     const next = idx > 0 ? all[idx - 1] : null;
     const currentSeries = post.series ? getSeriesByTitle(post.series, all) : null;
-    const sidebarPosts = post.series
-        ? all.filter((item) => item.series === post.series)
-        : all.filter((item) => item.slug !== post.slug).slice(0, 6);
+    const seriesPosts = post.series ? all.filter((item) => item.series === post.series) : [];
+    const recommendedPosts = all
+        .filter((item) => item.slug !== post.slug && (!post.series || item.series !== post.series))
+        .slice(0, 5);
 
     return (
         <main className="min-h-screen bg-[linear-gradient(180deg,#f8faf9_0%,#ffffff_55%,#f4f6f4_100%)] px-4 py-10 md:px-8 md:py-14">
@@ -65,19 +66,6 @@ export default async function PostPage({ params }: Props) {
                         </h1>
                         {post.excerpt ? (
                             <p className="mt-5 text-lg leading-8 text-slate-600">{post.excerpt}</p>
-                        ) : null}
-                        {post.tags.length > 0 ? (
-                            <div className="mt-6 flex flex-wrap gap-2">
-                                {post.tags.map((tag) => (
-                                    <Link
-                                        key={tag}
-                                        href={`/notes?tag=${encodeURIComponent(tag)}`}
-                                        className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700 transition hover:bg-slate-200"
-                                    >
-                                        #{tag}
-                                    </Link>
-                                ))}
-                            </div>
                         ) : null}
                     </header>
 
@@ -115,45 +103,84 @@ export default async function PostPage({ params }: Props) {
                 </article>
 
                 <aside className="space-y-5 lg:sticky lg:top-28">
-                    <section className="rounded-[26px] border border-slate-200 bg-white/80 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
-                        <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-                            <BookOpen size={15} />
-                            {post.series ? '专栏目录' : '推荐阅读'}
-                        </h2>
-                        <p className="mt-2 text-xs leading-6 text-slate-500">
-                            {post.series ? (currentSeries?.excerpt ?? `当前专栏：${post.series}`) : '这篇文章还没有归入专栏，先显示最新推荐。'}
-                        </p>
-                        {post.series ? (
+                    {post.series ? (
+                        <section className="rounded-[24px] border border-slate-200 bg-white/85 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
+                            <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                                <BookOpen size={15} />
+                                专栏目录
+                            </h2>
+                            <p className="mt-2 text-xs leading-6 text-slate-500">
+                                {currentSeries?.excerpt ?? post.series}
+                            </p>
                             <Link
                                 href={`/notes?series=${encodeURIComponent(post.series)}`}
                                 className="mt-3 inline-flex rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
                             >
                                 查看专栏全部文章
                             </Link>
-                        ) : null}
+                            <div className="mt-4 space-y-2">
+                                {seriesPosts.map((item) => {
+                                    const active = item.slug === post.slug;
+                                    return (
+                                        <Link
+                                            key={item.slug}
+                                            href={`/notes/${item.slug}`}
+                                            className={
+                                                active
+                                                    ? 'block rounded-2xl border border-slate-950 bg-slate-950 px-3 py-3 text-white'
+                                                    : 'block rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 transition hover:border-slate-200 hover:bg-white'
+                                            }
+                                        >
+                                            <time dateTime={item.date} className="font-mono text-xs text-slate-400">
+                                                {item.date}
+                                            </time>
+                                            <span className={active ? 'mt-1 block text-sm font-semibold leading-6 text-white' : 'mt-1 block text-sm font-semibold leading-6 text-slate-800'}>
+                                                {item.title}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    ) : null}
 
-                        <div className="mt-4 space-y-2">
-                            {sidebarPosts.map((item) => {
-                                const active = item.slug === post.slug;
-                                return (
+                    {post.tags.length > 0 ? (
+                        <section className="rounded-[24px] border border-slate-200 bg-white/85 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
+                            <h2 className="text-sm font-semibold text-slate-950">标签</h2>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {post.tags.map((tag) => (
                                     <Link
-                                        key={item.slug}
-                                        href={`/notes/${item.slug}`}
-                                        className={
-                                            active
-                                                ? 'block rounded-2xl border border-slate-950 bg-slate-950 px-3 py-3 text-white'
-                                                : 'block rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 transition hover:border-slate-200 hover:bg-white'
-                                        }
+                                        key={tag}
+                                        href={`/notes?tag=${encodeURIComponent(tag)}`}
+                                        className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 hover:text-slate-950"
                                     >
-                                        <time dateTime={item.date} className={active ? 'font-mono text-xs text-slate-400' : 'font-mono text-xs text-slate-400'}>
-                                            {item.date}
-                                        </time>
-                                        <span className={active ? 'mt-1 block text-sm font-semibold leading-6 text-white' : 'mt-1 block text-sm font-semibold leading-6 text-slate-800'}>
-                                            {item.title}
-                                        </span>
+                                        #{tag}
                                     </Link>
-                                );
-                            })}
+                                ))}
+                            </div>
+                        </section>
+                    ) : null}
+
+                    <section className="rounded-[24px] border border-slate-200 bg-white/85 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
+                        <h2 className="text-sm font-semibold text-slate-950">推荐阅读</h2>
+                        <div className="mt-3 space-y-2">
+                            {recommendedPosts.map((item) => (
+                                <Link
+                                    key={item.slug}
+                                    href={`/notes/${item.slug}`}
+                                    className="block rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 transition hover:border-slate-200 hover:bg-white"
+                                >
+                                    <time dateTime={item.date} className="font-mono text-xs text-slate-400">
+                                        {item.date}
+                                    </time>
+                                    <span className="mt-1 block text-sm font-semibold leading-6 text-slate-800">
+                                        {item.title}
+                                    </span>
+                                </Link>
+                            ))}
+                            {recommendedPosts.length === 0 ? (
+                                <p className="text-xs leading-6 text-slate-500">暂时没有更多推荐内容。</p>
+                            ) : null}
                         </div>
                     </section>
                 </aside>
