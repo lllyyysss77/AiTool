@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, BookOpen, CalendarDays } from 'lucide-react';
-import { getAllPosts, getPostBySlug } from '@/lib/posts';
+import { getAllPosts, getPostBySlug, getSeriesByTitle } from '@/lib/posts';
 import MarkdownView from '../MarkdownView';
 
 export const dynamic = 'force-dynamic';
@@ -29,6 +29,7 @@ export default async function PostPage({ params }: Props) {
     const idx = all.findIndex((p) => p.slug === slug);
     const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
     const next = idx > 0 ? all[idx - 1] : null;
+    const currentSeries = post.series ? getSeriesByTitle(post.series, all) : null;
     const sidebarPosts = post.series
         ? all.filter((item) => item.series === post.series)
         : all.filter((item) => item.slug !== post.slug).slice(0, 6);
@@ -120,7 +121,7 @@ export default async function PostPage({ params }: Props) {
                             {post.series ? '专栏目录' : '推荐阅读'}
                         </h2>
                         <p className="mt-2 text-xs leading-6 text-slate-500">
-                            {post.series ? `当前专栏：${post.series}` : '这篇文章还没有归入专栏，先显示最新推荐。'}
+                            {post.series ? (currentSeries?.excerpt ?? `当前专栏：${post.series}`) : '这篇文章还没有归入专栏，先显示最新推荐。'}
                         </p>
                         {post.series ? (
                             <Link

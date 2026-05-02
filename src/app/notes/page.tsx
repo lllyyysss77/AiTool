@@ -24,6 +24,56 @@ function buildHref(view: QuickView, filters: { tag?: string | null; series?: str
     return qs ? `/notes?${qs}` : '/notes';
 }
 
+function stripSeriesHeading(content: string) {
+    return content.replace(/^# .+?(?:\r?\n){1,2}/, '');
+}
+
+function renderInline(text: string) {
+    return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={index} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+    });
+}
+
+function renderSeriesIntro(content: string) {
+    return stripSeriesHeading(content)
+        .split(/\n{2,}/)
+        .map((block) => block.trim())
+        .filter(Boolean)
+        .map((block, index) => {
+            if (block.startsWith('### ')) {
+                return <h4 key={index} className="mt-5 text-base font-bold text-slate-900">{block.slice(4)}</h4>;
+            }
+            if (block.startsWith('## ')) {
+                return <h3 key={index} className="mt-6 text-lg font-black text-slate-950">{block.slice(3)}</h3>;
+            }
+
+            const lines = block.split('\n').map((line) => line.trim()).filter(Boolean);
+            if (lines.length > 0 && lines.every((line) => line.startsWith('- '))) {
+                return (
+                    <ul key={index} className="mt-3 list-disc space-y-1 pl-5 text-sm leading-7 text-slate-600">
+                        {lines.map((line) => <li key={line}>{renderInline(line.slice(2))}</li>)}
+                    </ul>
+                );
+            }
+            if (lines.length > 0 && lines.every((line) => /^\d+\.\s/.test(line))) {
+                return (
+                    <ol key={index} className="mt-3 list-decimal space-y-1 pl-5 text-sm leading-7 text-slate-600">
+                        {lines.map((line) => <li key={line}>{renderInline(line.replace(/^\d+\.\s/, ''))}</li>)}
+                    </ol>
+                );
+            }
+
+            return (
+                <p key={index} className="mt-3 text-sm leading-7 text-slate-600">
+                    {renderInline(lines.join(' '))}
+                </p>
+            );
+        });
+}
+
 export default async function NotesPage({ searchParams }: PageProps) {
     const sp = (await searchParams) ?? {};
     const view: QuickView = isQuickView(sp.view) ? sp.view : 'all';
@@ -40,6 +90,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
 
     const tagStats = getAllTags(allPosts);
     const seriesStats = getAllSeries(allPosts);
+    const selectedSeries = seriesFilter ? seriesStats.find((item) => item.series === seriesFilter) ?? null : null;
     const latest = filtered[0] ?? allPosts[0] ?? null;
 
     return (
@@ -142,11 +193,38 @@ export default async function NotesPage({ searchParams }: PageProps) {
                 </div>
             </section>
 
+            {selectedSeries ? (
+                <section className="mx-auto mt-6 max-w-7xl">
+                    <div className="rounded-[30px] border border-sky-100 bg-sky-50/70 p-5 shadow-[0_14px_44px_rgba(14,165,233,0.08)] md:p-6">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-sky-700">
+                                <BookOpen size={14} />
+                                当前专栏
+                            </div>
+                            <span className="font-mono text-xs text-sky-700">{selectedSeries.count} 篇文章</span>
+                        </div>
+                        <h2 className="mt-4 text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
+                            {selectedSeries.series}
+                        </h2>
+                        {selectedSeries.excerpt ? (
+                            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">{selectedSeries.excerpt}</p>
+                        ) : (
+                            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">这个专栏还没有写引子。可以在内容仓的 <code className="rounded bg-white px-1 py-0.5">series/</code> 里新增说明。</p>
+                        )}
+                        {selectedSeries.content ? (
+                            <div className="mt-5 rounded-[24px] border border-white/80 bg-white/70 p-5">
+                                {renderSeriesIntro(selectedSeries.content)}
+                            </div>
+                        ) : null}
+                    </div>
+                </section>
+            ) : null}
+
             <section className="mx-auto mt-6 grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,760px)_320px] lg:justify-center">
                 <div className="min-w-0">
                     {filtered.length === 0 ? (
                         <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/60 p-10 text-center text-sm text-slate-500">
-                            这个视图下还没有内容。在 <code className="rounded bg-slate-100 px-1.5 py-0.5">AiTool-content/posts/</code> 里写一篇带对应 tag 的 Markdown 就行。
+                            这个视图下还没有内容。在 <code className="rounded bg-slate-100 px-1.5 py-0.5">AiTool-content/posts/</code> 里写一篇符合当前筛选的 Markdown 就行。
                         </div>
                     ) : (
                         <div className="space-y-5">
@@ -220,7 +298,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
                         </h3>
                         {seriesStats.length > 0 ? (
                             <div className="mt-3 space-y-2">
-                                {seriesStats.map(({ series, count }) => {
+                                {seriesStats.map(({ series, count, excerpt, defined }) => {
                                     const active = seriesFilter === series;
                                     return (
                                         <Link
@@ -233,13 +311,18 @@ export default async function NotesPage({ searchParams }: PageProps) {
                                             }
                                         >
                                             <span className="block">{series}</span>
-                                            <span className="mt-1 block font-mono text-xs text-slate-400">{count} 篇</span>
+                                            {excerpt ? (
+                                                <span className="mt-1 line-clamp-2 block text-xs font-normal leading-5 text-slate-500">{excerpt}</span>
+                                            ) : null}
+                                            <span className="mt-2 block font-mono text-xs text-slate-400">
+                                                {count} 篇{defined ? '' : ' / 未建引子'}
+                                            </span>
                                         </Link>
                                     );
                                 })}
                             </div>
                         ) : (
-                            <p className="mt-3 text-xs leading-6 text-slate-500">还没有设置专栏。文章 frontmatter 增加 <code className="rounded bg-slate-100 px-1 py-0.5">series</code> 即可。</p>
+                            <p className="mt-3 text-xs leading-6 text-slate-500">还没有设置专栏。先在内容仓新增 <code className="rounded bg-slate-100 px-1 py-0.5">series/*.md</code> 引子，再给真正相关的文章加 <code className="rounded bg-slate-100 px-1 py-0.5">series</code>。</p>
                         )}
                     </section>
 
@@ -273,6 +356,9 @@ export default async function NotesPage({ searchParams }: PageProps) {
                         </p>
                         <p className="mt-2">
                             tag 完全自由,顶部快捷视图只匹配若干常用 tag(产品 / 生活 / AI / 工具 / 全部)。
+                        </p>
+                        <p className="mt-2">
+                            专栏是长期主题,先在内容仓 <code className="rounded bg-slate-100 px-1.5 py-0.5">series/</code> 写引子,文章再按需加入。
                         </p>
                     </section>
                 </aside>

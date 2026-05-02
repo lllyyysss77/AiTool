@@ -26,6 +26,24 @@ export interface Post extends PostMeta {
     content: string;
 }
 
+export interface SeriesFrontmatter {
+    title?: string;
+    order?: number;
+    excerpt?: string | null;
+    draft?: boolean;
+}
+
+export interface SeriesInfo {
+    slug: string;
+    series: string;
+    excerpt: string | null;
+    content: string | null;
+    order: number | null;
+    count: number;
+    latestPublishedAt: string;
+    defined: boolean;
+}
+
 export interface QuickViewSpec {
     id: QuickView;
     label: string;

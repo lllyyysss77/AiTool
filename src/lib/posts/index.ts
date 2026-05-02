@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
 import matter from 'gray-matter';
-import type { Post, PostFrontmatter, PostMeta } from './types';
+import type { Post, PostFrontmatter, PostMeta, SeriesFrontmatter, SeriesInfo } from './types';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -15,6 +15,10 @@ function resolveContentDir(): string {
 
 function postsDir(): string {
     return path.join(resolveContentDir(), 'posts');
+}
+
+function seriesDir(): string {
+    return path.join(resolveContentDir(), 'series');
 }
 
 function normalizeTags(raw: unknown): string[] {
@@ -31,7 +35,7 @@ function normalizeSeries(raw: unknown): string | null {
     return value ? value : null;
 }
 
-function pickExcerpt(fm: PostFrontmatter, body: string): string | null {
+function pickExcerpt(fm: { excerpt?: unknown }, body: string): string | null {
     if (fm.excerpt && typeof fm.excerpt === 'string') return fm.excerpt.trim();
     const firstParagraph = body
         .split(/\n{2,}/)
@@ -43,6 +47,14 @@ function pickExcerpt(fm: PostFrontmatter, body: string): string | null {
 
 function slugFromFile(filename: string): string {
     return filename.replace(/\.md$/, '');
+}
+
+function titleFromSlug(slug: string): string {
+    return slug
+        .split(/[-_]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
 }
 
 function normalizeDateTime(raw: unknown): string | null {
@@ -127,6 +139,52 @@ function parseFile(file: string): Post | null {
     };
 }
 
+function parseSeriesFile(file: string): SeriesInfo | null {
+    const dir = seriesDir();
+    const fullPath = path.join(dir, file);
+    let raw: string;
+    try {
+        raw = fs.readFileSync(fullPath, 'utf8');
+    } catch {
+        return null;
+    }
+
+    const { data, content } = matter(raw);
+    const fm = data as SeriesFrontmatter;
+    if (fm.draft === true) return null;
+
+    const slug = slugFromFile(file);
+    const title = typeof fm.title === 'string' && fm.title.trim() ? fm.title.trim() : titleFromSlug(slug);
+    const excerpt = typeof fm.excerpt === 'string' && fm.excerpt.trim() ? fm.excerpt.trim() : pickExcerpt({}, content);
+    const order = typeof fm.order === 'number' && Number.isFinite(fm.order) ? fm.order : null;
+
+    return {
+        slug,
+        series: title,
+        excerpt,
+        content: content.trim() || null,
+        order,
+        count: 0,
+        latestPublishedAt: '',
+        defined: true,
+    };
+}
+
+function getSeriesDefinitions(): SeriesInfo[] {
+    const dir = seriesDir();
+    let entries: string[];
+    try {
+        entries = fs.readdirSync(dir);
+    } catch {
+        return [];
+    }
+
+    return entries
+        .filter((f) => f.endsWith('.md'))
+        .map((f) => parseSeriesFile(f))
+        .filter((s): s is SeriesInfo => s !== null);
+}
+
 export function getAllPosts(): PostMeta[] {
     const dir = postsDir();
     let entries: string[];
@@ -163,20 +221,41 @@ export function getAllTags(posts: PostMeta[]): Array<{ tag: string; count: numbe
         .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, 'zh-CN'));
 }
 
-export function getAllSeries(posts: PostMeta[]): Array<{ series: string; count: number; latestPublishedAt: string }> {
-    const stats = new Map<string, { count: number; latestPublishedAt: string }>();
+export function getAllSeries(posts: PostMeta[]): SeriesInfo[] {
+    const stats = new Map<string, SeriesInfo>();
+
+    getSeriesDefinitions().forEach((item) => {
+        stats.set(item.series, { ...item });
+    });
+
     posts.forEach((post) => {
         if (!post.series) return;
         const current = stats.get(post.series);
         if (!current) {
-            stats.set(post.series, { count: 1, latestPublishedAt: post.publishedAt });
+            stats.set(post.series, {
+                slug: post.series,
+                series: post.series,
+                excerpt: null,
+                content: null,
+                order: null,
+                count: 1,
+                latestPublishedAt: post.publishedAt,
+                defined: false,
+            });
             return;
         }
         current.count += 1;
         if (post.publishedAt > current.latestPublishedAt) current.latestPublishedAt = post.publishedAt;
     });
 
-    return Array.from(stats.entries())
-        .map(([series, value]) => ({ series, ...value }))
-        .sort((a, b) => b.latestPublishedAt.localeCompare(a.latestPublishedAt) || b.count - a.count || a.series.localeCompare(b.series, 'zh-CN'));
+    return Array.from(stats.values()).sort((a, b) => {
+        if (a.order !== null || b.order !== null) return (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER);
+        if (a.latestPublishedAt !== b.latestPublishedAt) return b.latestPublishedAt.localeCompare(a.latestPublishedAt);
+        if (a.count !== b.count) return b.count - a.count;
+        return a.series.localeCompare(b.series, 'zh-CN');
+    });
+}
+
+export function getSeriesByTitle(series: string, posts: PostMeta[] = getAllPosts()): SeriesInfo | null {
+    return getAllSeries(posts).find((item) => item.series === series) ?? null;
 }
