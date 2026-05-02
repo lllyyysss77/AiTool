@@ -5,6 +5,7 @@ export interface PostFrontmatter {
     date: string | Date;
     publishedAt?: string | Date;
     tags?: string[];
+    series?: string | null;
     cover?: string | null;
     excerpt?: string | null;
     draft?: boolean;
@@ -16,6 +17,7 @@ export interface PostMeta {
     date: string;
     publishedAt: string;
     tags: string[];
+    series: string | null;
     cover: string | null;
     excerpt: string | null;
 }

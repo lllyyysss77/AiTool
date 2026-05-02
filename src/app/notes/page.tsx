@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import { ArrowRight, Hash, NotebookPen, Tags } from 'lucide-react';
-import { getAllPosts, getAllTags } from '@/lib/posts';
+import { ArrowRight, BookOpen, Hash, NotebookPen, Tags } from 'lucide-react';
+import { getAllPosts, getAllSeries, getAllTags } from '@/lib/posts';
 import { QUICK_VIEWS, postMatchesView, type QuickView } from '@/lib/posts/types';
 import AiosTicker from '../components/AiosTicker';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-    searchParams?: Promise<{ view?: string; tag?: string }>;
+    searchParams?: Promise<{ view?: string; tag?: string; series?: string }>;
 }
 
 function isQuickView(value: string | undefined): value is QuickView {
@@ -15,10 +15,11 @@ function isQuickView(value: string | undefined): value is QuickView {
     return QUICK_VIEWS.some((v) => v.id === value);
 }
 
-function buildHref(view: QuickView, tag?: string) {
+function buildHref(view: QuickView, filters: { tag?: string | null; series?: string | null } = {}) {
     const params = new URLSearchParams();
     if (view !== 'all') params.set('view', view);
-    if (tag) params.set('tag', tag);
+    if (filters.tag) params.set('tag', filters.tag);
+    if (filters.series) params.set('series', filters.series);
     const qs = params.toString();
     return qs ? `/notes?${qs}` : '/notes';
 }
@@ -27,15 +28,18 @@ export default async function NotesPage({ searchParams }: PageProps) {
     const sp = (await searchParams) ?? {};
     const view: QuickView = isQuickView(sp.view) ? sp.view : 'all';
     const tagFilter = typeof sp.tag === 'string' && sp.tag.trim() ? sp.tag.trim() : null;
+    const seriesFilter = typeof sp.series === 'string' && sp.series.trim() ? sp.series.trim() : null;
 
     const allPosts = getAllPosts();
     const filtered = allPosts.filter((p) => {
         if (!postMatchesView(p, view)) return false;
         if (tagFilter && !p.tags.includes(tagFilter)) return false;
+        if (seriesFilter && p.series !== seriesFilter) return false;
         return true;
     });
 
     const tagStats = getAllTags(allPosts);
+    const seriesStats = getAllSeries(allPosts);
     const latest = filtered[0] ?? allPosts[0] ?? null;
 
     return (
@@ -77,9 +81,9 @@ export default async function NotesPage({ searchParams }: PageProps) {
                             <div className="text-xs text-slate-500">当前视图</div>
                         </div>
                         <div className="rounded-2xl bg-slate-50 p-3">
-                            <NotebookPen size={16} className="text-slate-500" />
-                            <div className="mt-2 font-mono text-sm text-slate-950">{latest?.date ?? '-'}</div>
-                            <div className="text-xs text-slate-500">最新日期</div>
+                            <BookOpen size={16} className="text-slate-500" />
+                            <div className="mt-2 font-mono text-lg text-slate-950">{seriesStats.length}</div>
+                            <div className="text-xs text-slate-500">专栏数</div>
                         </div>
                     </div>
                     {latest ? (
@@ -108,7 +112,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
                         return (
                             <Link
                                 key={spec.id}
-                                href={buildHref(spec.id, tagFilter ?? undefined)}
+                                href={buildHref(spec.id, { tag: tagFilter, series: seriesFilter })}
                                 className={
                                     active
                                         ? 'rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white shadow-[0_10px_28px_rgba(15,23,42,0.18)]'
@@ -121,10 +125,18 @@ export default async function NotesPage({ searchParams }: PageProps) {
                     })}
                     {tagFilter ? (
                         <Link
-                            href={buildHref(view)}
+                            href={buildHref(view, { series: seriesFilter })}
                             className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
                         >
                             #{tagFilter} ✕
+                        </Link>
+                    ) : null}
+                    {seriesFilter ? (
+                        <Link
+                            href={buildHref(view, { tag: tagFilter })}
+                            className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                        >
+                            专栏：{seriesFilter} ✕
                         </Link>
                     ) : null}
                 </div>
@@ -152,6 +164,14 @@ export default async function NotesPage({ searchParams }: PageProps) {
                                     <div className="p-6 md:p-7">
                                         <div className="flex items-center gap-3 text-xs text-slate-500">
                                             <time dateTime={post.date} className="font-mono">{post.date}</time>
+                                            {post.series ? (
+                                                <Link
+                                                    href={buildHref(view, { tag: tagFilter, series: post.series })}
+                                                    className="rounded-full bg-sky-50 px-2.5 py-1 font-semibold text-sky-700 transition hover:bg-sky-100"
+                                                >
+                                                    专栏 / {post.series}
+                                                </Link>
+                                            ) : null}
                                         </div>
                                         <Link href={`/notes/${post.slug}`} className="mt-3 block">
                                             <h2 className="text-2xl font-semibold tracking-tight text-slate-950 transition group-hover:text-sky-700">
@@ -166,7 +186,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
                                                 {post.tags.map((tag) => (
                                                     <Link
                                                         key={tag}
-                                                        href={buildHref(view, tag)}
+                                                        href={buildHref(view, { tag, series: seriesFilter })}
                                                         className={
                                                             tagFilter === tag
                                                                 ? 'rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700'
@@ -194,13 +214,43 @@ export default async function NotesPage({ searchParams }: PageProps) {
 
                 <aside className="space-y-5 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-auto">
                     <section className="rounded-[26px] border border-slate-200 bg-white/80 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
+                        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                            <BookOpen size={15} />
+                            专栏筛选
+                        </h3>
+                        {seriesStats.length > 0 ? (
+                            <div className="mt-3 space-y-2">
+                                {seriesStats.map(({ series, count }) => {
+                                    const active = seriesFilter === series;
+                                    return (
+                                        <Link
+                                            key={series}
+                                            href={buildHref(view, { tag: tagFilter, series })}
+                                            className={
+                                                active
+                                                    ? 'block rounded-2xl border border-sky-200 bg-sky-50 px-3 py-3 text-sm font-semibold text-sky-800'
+                                                    : 'block rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-200 hover:bg-white hover:text-slate-950'
+                                            }
+                                        >
+                                            <span className="block">{series}</span>
+                                            <span className="mt-1 block font-mono text-xs text-slate-400">{count} 篇</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <p className="mt-3 text-xs leading-6 text-slate-500">还没有设置专栏。文章 frontmatter 增加 <code className="rounded bg-slate-100 px-1 py-0.5">series</code> 即可。</p>
+                        )}
+                    </section>
+
+                    <section className="rounded-[26px] border border-slate-200 bg-white/80 p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] backdrop-blur">
                         <h3 className="text-sm font-semibold text-slate-950">标签云</h3>
                         {tagStats.length > 0 ? (
                             <div className="mt-3 flex flex-wrap gap-2">
                                 {tagStats.map(({ tag, count }) => (
                                     <Link
                                         key={tag}
-                                        href={buildHref(view, tag)}
+                                        href={buildHref(view, { tag, series: seriesFilter })}
                                         className={
                                             tagFilter === tag
                                                 ? 'rounded-full bg-rose-100 px-3 py-1 text-xs font-bold text-rose-700'

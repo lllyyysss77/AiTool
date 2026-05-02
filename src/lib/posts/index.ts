@@ -25,6 +25,12 @@ function normalizeTags(raw: unknown): string[] {
         .filter(Boolean);
 }
 
+function normalizeSeries(raw: unknown): string | null {
+    if (typeof raw !== 'string') return null;
+    const value = raw.trim();
+    return value ? value : null;
+}
+
 function pickExcerpt(fm: PostFrontmatter, body: string): string | null {
     if (fm.excerpt && typeof fm.excerpt === 'string') return fm.excerpt.trim();
     const firstParagraph = body
@@ -114,6 +120,7 @@ function parseFile(file: string): Post | null {
         date: dateStr,
         publishedAt: pickPublishedAt(fm, fullPath, dateStr),
         tags: normalizeTags(fm.tags),
+        series: normalizeSeries(fm.series),
         cover: typeof fm.cover === 'string' ? fm.cover : null,
         excerpt: pickExcerpt(fm, content),
         content,
@@ -154,4 +161,22 @@ export function getAllTags(posts: PostMeta[]): Array<{ tag: string; count: numbe
     return Array.from(counts.entries())
         .map(([tag, count]) => ({ tag, count }))
         .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, 'zh-CN'));
+}
+
+export function getAllSeries(posts: PostMeta[]): Array<{ series: string; count: number; latestPublishedAt: string }> {
+    const stats = new Map<string, { count: number; latestPublishedAt: string }>();
+    posts.forEach((post) => {
+        if (!post.series) return;
+        const current = stats.get(post.series);
+        if (!current) {
+            stats.set(post.series, { count: 1, latestPublishedAt: post.publishedAt });
+            return;
+        }
+        current.count += 1;
+        if (post.publishedAt > current.latestPublishedAt) current.latestPublishedAt = post.publishedAt;
+    });
+
+    return Array.from(stats.entries())
+        .map(([series, value]) => ({ series, ...value }))
+        .sort((a, b) => b.latestPublishedAt.localeCompare(a.latestPublishedAt) || b.count - a.count || a.series.localeCompare(b.series, 'zh-CN'));
 }
