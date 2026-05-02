@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { execFileSync } from 'child_process';
 import matter from 'gray-matter';
 import type { Post, PostFrontmatter, PostMeta } from './types';
 
@@ -38,6 +39,52 @@ function slugFromFile(filename: string): string {
     return filename.replace(/\.md$/, '');
 }
 
+function normalizeDateTime(raw: unknown): string | null {
+    if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+        return raw.toISOString();
+    }
+    if (typeof raw !== 'string') return null;
+
+    const value = raw.trim();
+    if (!value) return null;
+    if (DATE_RE.test(value)) return `${value}T00:00:00.000Z`;
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return parsed.toISOString();
+}
+
+function gitPublishedAt(fullPath: string): string | null {
+    const contentRoot = resolveContentDir();
+    const relativePath = path.relative(contentRoot, fullPath);
+    if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) return null;
+
+    try {
+        const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', relativePath], {
+            cwd: contentRoot,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+        }).trim();
+        return normalizeDateTime(out);
+    } catch {
+        return null;
+    }
+}
+
+function pickPublishedAt(fm: PostFrontmatter, fullPath: string, dateStr: string): string {
+    const explicit = normalizeDateTime(fm.publishedAt);
+    if (explicit) return explicit;
+
+    const fromGit = gitPublishedAt(fullPath);
+    if (fromGit) return fromGit;
+
+    try {
+        return fs.statSync(fullPath).mtime.toISOString();
+    } catch {
+        return `${dateStr}T00:00:00.000Z`;
+    }
+}
+
 function parseFile(file: string): Post | null {
     const dir = postsDir();
     const fullPath = path.join(dir, file);
@@ -65,6 +112,7 @@ function parseFile(file: string): Post | null {
         slug: slugFromFile(file),
         title: fm.title.trim(),
         date: dateStr,
+        publishedAt: pickPublishedAt(fm, fullPath, dateStr),
         tags: normalizeTags(fm.tags),
         cover: typeof fm.cover === 'string' ? fm.cover : null,
         excerpt: pickExcerpt(fm, content),
@@ -87,7 +135,11 @@ export function getAllPosts(): PostMeta[] {
         .filter((p): p is Post => p !== null)
         .map(({ content: _content, ...meta }) => meta);
 
-    posts.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.title.localeCompare(b.title, 'zh-CN')));
+    posts.sort((a, b) => {
+        if (a.publishedAt !== b.publishedAt) return a.publishedAt < b.publishedAt ? 1 : -1;
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return a.title.localeCompare(b.title, 'zh-CN');
+    });
 
     return posts;
 }

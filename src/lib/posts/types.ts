@@ -3,6 +3,7 @@ export type QuickView = 'all' | 'product' | 'life' | 'ai' | 'tools';
 export interface PostFrontmatter {
     title: string;
     date: string | Date;
+    publishedAt?: string | Date;
     tags?: string[];
     cover?: string | null;
     excerpt?: string | null;
@@ -13,6 +14,7 @@ export interface PostMeta {
     slug: string;
     title: string;
     date: string;
+    publishedAt: string;
     tags: string[];
     cover: string | null;
     excerpt: string | null;
