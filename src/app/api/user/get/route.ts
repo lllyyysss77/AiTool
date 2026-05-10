@@ -5,6 +5,7 @@ import {
     getUnifiedProfileAccountName,
     getUnifiedProfileDisplayName,
 } from '@/lib/auth/unifiedBackend';
+import { isAdminProfile } from '@/lib/auth/admin';
 
 export async function GET(request: NextRequest) {
     const token = request.cookies.get('sessionToken')?.value;
@@ -21,6 +22,7 @@ export async function GET(request: NextRequest) {
                 name: getUnifiedProfileAccountName(profile),
                 displayName: getUnifiedProfileDisplayName(profile),
                 email: profile.email,
+                isAdmin: isAdminProfile(profile),
             },
         }, { status: 200 });
     } catch (err) {

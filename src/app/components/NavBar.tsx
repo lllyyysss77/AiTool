@@ -120,7 +120,7 @@ export default function NavBar() {
   }
 
   const search = searchParams?.toString() ? `?${searchParams.toString()}` : "";
-  const loginHref = buildLoginModalPath(pathname, search);
+  const loginHref = buildLoginModalPath(pathname, search, "/dashboard");
   const displayName = user?.displayName || "User";
   const firstChar = displayName.charAt(0).toUpperCase();
 
@@ -220,6 +220,13 @@ export default function NavBar() {
                     >
                       个人信息
                     </button>
+                    <Link
+                      href="/dashboard"
+                      className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-white hover:text-slate-900"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      {user.isAdmin ? "管理员导航" : "个人导航"}
+                    </Link>
                     <button
                       type="button"
                       className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-rose-600 transition hover:bg-rose-50"
@@ -244,7 +251,10 @@ export default function NavBar() {
       </div>
 
       {showUserModal && user ? (
-        <UserInfoModal data={user} onClose={() => setShowUserModal(false)} />
+        <UserInfoModal
+          data={{ ...user, email: user.email ?? undefined }}
+          onClose={() => setShowUserModal(false)}
+        />
       ) : null}
     </>
   );

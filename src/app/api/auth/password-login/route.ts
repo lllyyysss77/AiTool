@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
             user: {
                 name: getUnifiedProfileAccountName(profile),
                 displayName: getUnifiedProfileDisplayName(profile),
+                email: profile.email,
             },
         });
         setAuthCookies(response, accessToken, profile.id);

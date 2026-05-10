@@ -40,12 +40,13 @@ export async function POST(request: NextRequest) {
         }, request);
 
         if (payload.verification_required) {
-            return badRequest(
-                payload.email_delivery
+            return NextResponse.json({
+                ok: true,
+                verificationRequired: true,
+                msg: payload.email_delivery
                     ? '注册成功，验证邮件已发送。请先点击邮箱里的验证链接，再回来登录。'
                     : '注册成功，请先完成邮箱验证后再登录。',
-                202,
-            );
+            });
         }
 
         const accessToken = payload.access_token;
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
             user: {
                 name: getUnifiedProfileAccountName(profile),
                 displayName: getUnifiedProfileDisplayName(profile),
+                email: profile.email,
             },
         });
         setAuthCookies(response, accessToken, profile.id);

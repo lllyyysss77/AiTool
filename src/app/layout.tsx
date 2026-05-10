@@ -8,6 +8,7 @@ import {
   getUnifiedProfileAccountName,
   getUnifiedProfileDisplayName,
 } from "@/lib/auth/unifiedBackend";
+import { isAdminProfile } from "@/lib/auth/admin";
 import { UserProvider, User } from "./providers/UserProvider";
 import ClientBoot from "./ClientBoot";
 
@@ -30,6 +31,8 @@ export default async function RootLayout({
       initialUser = {
         name: getUnifiedProfileAccountName(profile),
         displayName: getUnifiedProfileDisplayName(profile),
+        email: profile.email,
+        isAdmin: isAdminProfile(profile),
       };
     } catch (e) {
       console.error("SSR unified backend fetch-profile failed", e);

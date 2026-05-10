@@ -5,6 +5,8 @@ interface ApiUser {
     name: string;
     displayName?: string;
     avatar?: string;
+    email?: string;
+    isAdmin?: boolean;
 }
 
 interface UserResponse {

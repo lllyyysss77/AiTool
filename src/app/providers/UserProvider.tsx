@@ -9,6 +9,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export interface User {
     name: string;
     displayName: string;
+    email?: string | null;
+    isAdmin?: boolean;
 }
 
 interface UserContextValue {

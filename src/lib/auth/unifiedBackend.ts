@@ -8,6 +8,12 @@ export interface UnifiedBackendProfile {
     email?: string | null;
     email_verified_at?: string | null;
     display_name?: string | null;
+    admin_services?: Array<{
+        service_code: string;
+        service_label?: string;
+        role?: string;
+        status?: string;
+    }>;
 }
 
 export interface UnifiedBackendAuthPayload {
@@ -213,8 +219,27 @@ export async function registerWithUnifiedBackend(input: {
     }, request);
 }
 
+export async function requestPasswordResetWithUnifiedBackend(input: {
+    email: string;
+    humanToken: string;
+}, request?: NextRequest) {
+    return backendJson<{ ok: boolean }>('/v1/auth/password/forgot', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Human-Token': input.humanToken,
+        },
+        body: JSON.stringify({
+            email: input.email,
+        }),
+    }, request);
+}
+
 export async function fetchUnifiedProfile(accessToken: string, request?: NextRequest) {
-    const payload = await backendJson<{ profile: UnifiedBackendProfile }>('/v1/me', {
+    const payload = await backendJson<{
+        profile: UnifiedBackendProfile;
+        admin_services?: UnifiedBackendProfile['admin_services'];
+    }>('/v1/me', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -225,7 +250,10 @@ export async function fetchUnifiedProfile(accessToken: string, request?: NextReq
         throw new Error('Unified backend 账户信息不完整');
     }
 
-    return payload.profile;
+    return {
+        ...payload.profile,
+        admin_services: payload.admin_services ?? payload.profile.admin_services ?? [],
+    };
 }
 
 export function getUnifiedProfileDisplayName(profile: UnifiedBackendProfile) {

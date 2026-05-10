@@ -22,7 +22,11 @@ export default function MarkdownView({ content }: Props) {
     return (
         <div className="notes-prose prose prose-slate max-w-none prose-headings:font-semibold prose-headings:text-slate-950 prose-h2:mt-12 prose-h2:text-3xl prose-h2:tracking-tight prose-h3:mt-10 prose-h3:text-2xl prose-h4:mt-8 prose-h4:text-xl prose-p:leading-8 prose-p:text-slate-700 prose-a:text-sky-700 prose-a:underline-offset-4 hover:prose-a:text-sky-900 prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.92em] prose-code:before:content-none prose-code:after:content-none prose-pre:overflow-x-auto prose-pre:rounded-[24px] prose-pre:border prose-pre:border-slate-200 prose-pre:bg-slate-50 prose-pre:p-5 prose-img:rounded-[24px] prose-img:border prose-img:border-slate-200 prose-img:shadow-[0_18px_55px_rgba(15,23,42,0.08)] prose-blockquote:border-l-slate-300 prose-blockquote:text-slate-600 prose-hr:my-12 prose-hr:border-slate-200 prose-table:text-sm">
             <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkDirective, remarkDirectives]}
+                remarkPlugins={[
+                    [remarkGfm, { singleTilde: false }],
+                    remarkDirective,
+                    remarkDirectives,
+                ]}
                 rehypePlugins={[
                     rehypeRaw,
                     rehypeSlug,
