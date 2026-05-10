@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { UNIFIED_BACKEND_CONFIG } from '@/config';
 import { buildLoginModalHomePath, normalizeLoginNext } from '@/lib/auth/loginModal';
+import { buildPublicUrl } from '@/lib/publicUrl';
+
+export const dynamic = 'force-dynamic';
 
 function backendUrl(path: string) {
     return new URL(path, UNIFIED_BACKEND_CONFIG.baseUrl.replace(/\/$/, '')).toString();
@@ -10,8 +13,8 @@ function backendUrl(path: string) {
 export async function GET(request: NextRequest) {
     const next = normalizeLoginNext(request.nextUrl.searchParams.get('next'), '/dashboard');
     const humanToken = request.nextUrl.searchParams.get('humanToken')?.trim();
-    const returnUrl = new URL(buildLoginModalHomePath(next), request.nextUrl.origin);
-    const failureUrl = new URL(buildLoginModalHomePath(next), request.nextUrl.origin);
+    const returnUrl = buildPublicUrl(buildLoginModalHomePath(next), request);
+    const failureUrl = buildPublicUrl(buildLoginModalHomePath(next), request);
 
     if (!humanToken) {
         failureUrl.hash = new URLSearchParams({ google_error: '请先长按完成人机验证' }).toString();

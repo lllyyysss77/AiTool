@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { buildLoginModalHomePath } from '@/lib/auth/loginModal';
+import { buildPublicUrl } from '@/lib/publicUrl';
 
 function decodeJwtPayload(token: string) {
     const [, rawPayload] = token.split('.');
@@ -16,7 +17,7 @@ function isExpired(payload: any) {
 }
 
 export function middleware(request: NextRequest) {
-    const { pathname, origin, search } = request.nextUrl;
+    const { pathname, search } = request.nextUrl;
 
     if (
         pathname.startsWith('/api/auth/') ||
@@ -51,7 +52,7 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    const confirmUrl = new URL(buildLoginModalHomePath(`${pathname}${search}`), origin);
+    const confirmUrl = buildPublicUrl(buildLoginModalHomePath(`${pathname}${search}`), request);
     const res = NextResponse.redirect(confirmUrl);
     res.cookies.set('sessionToken', '', { maxAge: 0, path: '/' });
     res.cookies.set('userId', '', { maxAge: 0, path: '/' });
