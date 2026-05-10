@@ -7,7 +7,7 @@ import { buildPublicUrl } from '@/lib/publicUrl';
 export const dynamic = 'force-dynamic';
 
 function backendUrl(path: string) {
-    return new URL(path, UNIFIED_BACKEND_CONFIG.baseUrl.replace(/\/$/, '')).toString();
+    return new URL(path, UNIFIED_BACKEND_CONFIG.googleBaseUrl.replace(/\/$/, '')).toString();
 }
 
 export async function GET(request: NextRequest) {

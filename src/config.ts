@@ -24,6 +24,14 @@ export const UNIFIED_BACKEND_CONFIG = {
         readOptionalEnv(['UNIFIED_APP_BACKEND_URL', 'NEXT_PUBLIC_UNIFIED_APP_BACKEND_URL'], [
             'https://your-unified-backend-domain',
         ]) || 'http://localhost:8787',
+    googleBaseUrl:
+        readOptionalEnv(['UNIFIED_APP_GOOGLE_BACKEND_URL', 'NEXT_PUBLIC_UNIFIED_APP_GOOGLE_BACKEND_URL'], [
+            'https://your-google-oauth-backend-domain',
+        ]) ||
+        readOptionalEnv(['UNIFIED_APP_BACKEND_URL', 'NEXT_PUBLIC_UNIFIED_APP_BACKEND_URL'], [
+            'https://your-unified-backend-domain',
+        ]) ||
+        'http://localhost:8787',
     appCode:
         readOptionalEnv(['UNIFIED_APP_CODE', 'NEXT_PUBLIC_UNIFIED_APP_CODE'], [
             'your_app_code',

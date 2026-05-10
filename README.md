@@ -81,6 +81,9 @@ npm install
 UNIFIED_APP_BACKEND_URL=https://appapi.example.com
 NEXT_PUBLIC_UNIFIED_APP_BACKEND_URL=https://appapi.example.com
 
+# 可选：Google OAuth 建议走可稳定访问 Google 的后端区域，例如东京。
+UNIFIED_APP_GOOGLE_BACKEND_URL=https://jp-appapi.example.com
+
 UNIFIED_APP_CODE=aitool
 NEXT_PUBLIC_UNIFIED_APP_CODE=aitool
 
